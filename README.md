@@ -5,8 +5,12 @@ Performant index of Pages, Field-Structures and Files.
 ## Usage
 
 ```php
-$autoid = 'an-autoid-value';
+$autoid = 'any-autoid-value';
 $result = $kirby->pages()->autoid($autoid);
+// or
+$result = Bnomei\AutoID::find($autoid);
+// or
+$result = autoid($autoid);
 
 if(is_a($result, 'Kirby\Cms\Page')) {
     // got a page
