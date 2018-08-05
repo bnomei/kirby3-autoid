@@ -1,6 +1,6 @@
 # Kirby 3 AutoID
 
-Performant index of Pages, Field-Structures and Files.
+Performant index of Pages, StructureObjects and Files.
 
 ## Usage
 
@@ -14,8 +14,8 @@ $result = autoid($autoid);
 
 if(is_a($result, 'Kirby\Cms\Page')) {
     // got a page
-} else if(is_a($result, 'Kirby\Cms\Field')) {
-    // got a Structure as Field
+} else if(is_a($result, 'Kirby\Cms\StructureObject')) {
+    // got a StructureObject
 } else if(is_a($result, 'Kirby\Cms\File')) {
     // got a File
 }

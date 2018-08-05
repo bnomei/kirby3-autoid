@@ -68,6 +68,7 @@ class AutoID
         string $structureFieldname = null,
         string $filename = null
     ): array {
+        // 1 char keys to reduce filesize of cache => more speed
         $tmp[$autoid] = [
             'i' => $pageId,
             's' => $structureFieldname,
@@ -95,53 +96,89 @@ class AutoID
 
     private static function indexPage(\Kirby\Cms\Page $page, array $commits = []): int
     {
-        $update = [];
+        $commitsPage = [];
+        $commitsFiles = [];
+        $updatePage = []; // array to update Page-Object with
+        $updateFile = []; // array to update Page-Object with
 
         foreach ($page->blueprint()->fields() as $field) {
             if (option('bnomei.autoid.index.pages') && $field->key() == static::$fieldname) {
                 if ($field->isEmpty()) {
                     $autoid = static::generator();
-                    $update[] = [
+                    $updatePage[] = [
                         static::$fieldname => $autoid
                     ];
-                    $commits = static::commitEntry($commit, $autoid, $page->id());
+                    $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id());
                 } else {
-                    $commits = static::commitEntry($commit, $field->value(), $page->id());
+                    $commitsPage = static::commitEntry($commitsPage, $field->value(), $page->id());
                 }
             } else if (option('bnomei.autoid.index.structures')) {
-                foreach ($field->toStructure() as $structureField) {
+                // make copy as array so can update
+                $data = \Yaml::decode($field->value());
+                // var_dump($data); die(); // TODO: check structures-array structure ;-)
+                $copy = $data; // this is a copy since its an array
+                $hasChange = false;
+                foreach ($data as $structureField) {
+                    // TODO: this probably wrong. key might be numeric sort order. maybe loop through fields in $structureObject?
                     // TODO: is support for nested structures needed?
-                    if ($structureField->key() == static::$fieldname) {
-                        // TODO: check is is empty or not
+                    if ($structureField['key'] == static::$fieldname) {
+                        // check is is empty or not
+                        $value = \Kirby\Toolkit\A::get($structureField, 'value');
+                        if(empty($value)) {
+                            // update structure in copy
+                            $hasChange = true;
+                            $autoid = static::generator();
+                            $copy[''][''][static::$fieldname] = $autoid; // TODO: figure this out
+                            $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field->key());
+                        } else {
+                            $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field->key());
+                        }
+                    }
+                }
+                if($hasChange) {
+                    $updatePage[] = [
+                        $field->key() => \Yaml::encode($copy),
+                    ];
+                }
+            }
+        }
 
-                        // TODO: update structure
-
-                        // TODO: add commit
-                        /*
-                        $commits = static::commitEntry($commit, $structureField->value(), $page->id(), $field->key());
-                        */
+        // loop through each File of page and check blueprint and fields
+        if (option('bnomei.autoid.index.files')) {
+            foreach ($page->files() as $file) {
+                foreach ($file->blueprint()->fields() as $field) {
+                    if ($field->key() == static::$fieldname) {
+                        if ($field->isEmpty()) {
+                            $autoid = static::generator();
+                            $updateFile = [
+                                static::$fieldname => $autoid
+                            ];
+                            
+                            try {
+                                $file->update($updateFile);
+                                $commitsFiles = static::commitEntry($commitsFiles, $autoid, $page->id(), null, $file->filename());  // TODO: name or filename?
+                            } catch (Exception $e) {
+                                // echo $e->getMessage();
+                                // TODO: throw exception again?
+                            }
+                        } else {
+                            $commitsFiles = static::commitEntry($commitsFiles, $field->value(), $page->id(), null, $file->filename());  // TODO: name or filename?
+                        }
                     }
                 }
             }
         }
-
-        // TODO: loop through each File of page and check blueprint and field
-        if (option('bnomei.autoid.index.files')) {
-            foreach ($page->files() as $file) {
-                /*
-                $commits = static::commitEntry($commit, $autoid, $page->id(), null, $file->name()); // TODO: name or filename?
-                */
-            }
-        }
         
-
         try {
-            $page->update($update);
+            if (count($updatePage) > 0) {
+                $page->update($updatePage);
+            }
         } catch (Exception $e) {
             // echo $e->getMessage();
             // TODO: throw exception again?
+            $commitsPage = []; // reset since failed
         }
-        return $commits;
+        return array_merge($commits, $commitsPage, $commitsFiles);
     }
 
     public static function find($autoid)
@@ -149,7 +186,12 @@ class AutoID
         if ($entry = \Kirby\Toolkit\A::get(static::index(), $autoid)) {
             if ($page = \page(\Kirby\Toolkit\A::get($entry, 'i'))) {
                 if ($structureField = \Kirby\Toolkit\A::get($entry, 's')) {
-                    return $page->${$structureField}();
+                    foreach($page->${$structureField}()->toStructure() as $structureObject) {
+                        // TODO: this probably wrong. key might be numeric sort order. maybe loop through fields in $structureObject?
+                        if($structureObject->key() == static::$fieldname {
+                            return $structureObject;
+                        }
+                    }
                 } elseif ($filename = \Kirby\Toolkit\A::get($entry, 'f')) {
                     return $page->file($filename);
                 }
