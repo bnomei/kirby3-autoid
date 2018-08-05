@@ -98,7 +98,7 @@ class AutoID
         $update = [];
 
         foreach ($page->blueprint()->fields() as $field) {
-            if ($field->key() == static::$fieldname) {
+            if (option('bnomei.autoid.index.pages') && $field->key() == static::$fieldname) {
                 if ($field->isEmpty()) {
                     $autoid = static::generator();
                     $update[] = [
@@ -108,7 +108,7 @@ class AutoID
                 } else {
                     $commits = static::commitEntry($commit, $field->value(), $page->id());
                 }
-            } else {
+            } else if (option('bnomei.autoid.index.structures')) {
                 foreach ($field->toStructure() as $structureField) {
                     // TODO: is support for nested structures needed?
                     if ($structureField->key() == static::$fieldname) {
@@ -126,10 +126,12 @@ class AutoID
         }
 
         // TODO: loop through each File of page and check blueprint and field
-        foreach ($page->files() as $file) {
-            /*
-            $commits = static::commitEntry($commit, $autoid, $page->id(), null, $file->name()); // TODO: name or filename?
-            */
+        if (option('bnomei.autoid.index.files')) {
+            foreach ($page->files() as $file) {
+                /*
+                $commits = static::commitEntry($commit, $autoid, $page->id(), null, $file->name()); // TODO: name or filename?
+                */
+            }
         }
         
 
@@ -217,7 +219,7 @@ class AutoID
             $hash = static::defaultGenerator();
         }
         // if custom generator is not unique enough give it a few tries
-        $break = option('bnomei.autoid.break');
+        $break = option('bnomei.autoid.generator.break');
         while($break > 0 && \Kirby\Toolkit\A::get(static::index(), $hash) != null) {
             $hash = static::generator($seed);
             $break--;

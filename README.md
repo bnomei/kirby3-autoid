@@ -26,6 +26,18 @@ if(is_a($result, 'Kirby\Cms\Page')) {
 **generator**
 - default: alphanumeric hash value generator (~2.8 trillion possibilites)
 
+**generator.break**
+- default: try `42` times to generate and verify uniqueness oh hash
+
+**index.pages**
+- default: `true`
+
+**index.structures**
+- default: `true`
+
+**index.files**
+- default: `true`
+
 
 ## Disclaimer
 
