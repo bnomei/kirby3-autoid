@@ -24,7 +24,7 @@ if(is_a($result, 'Kirby\Cms\Page')) {
 ## Settings
 
 **generator**
-- default: an unique hash value generator
+- default: alphanumeric hash value generator (~2.8 trillion possibilites)
 
 
 ## Disclaimer
