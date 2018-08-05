@@ -208,14 +208,25 @@ class AutoID
 
     public static function generator(string $seed = null): string
     {
+        $hash = null;
         $generator = kirby()->option('bnomei.autoid.generator');
         if ($generator && is_callable($generator)) {
-            return (string) $generator($seed);
+            $hash = $generator($seed);
         }
-        // else {
-        //     // TODO: might throw exception if failed?
-        // }
-        return static::defaultGenerator();
+        else {
+            $hash = static::defaultGenerator();
+        }
+        // if custom generator is not unique enough give it a few tries
+        $break = option('bnomei.autoid.break');
+        while($break > 0 && \Kirby\Toolkit\A::get(static::index(), $hash) != null) {
+            $hash = static::generator($seed);
+            $break--;
+            if($break == 0) {
+                // TODO: throw exception and/or do logging?
+                $hash = static::defaultGenerator();
+            }
+        }
+        return $hash;
     }
 
     /****************************************************************

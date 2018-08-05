@@ -7,6 +7,7 @@ Kirby::plugin('bnomei/autoid', [
             // override with custom callback if needed
             return \Bnomei\AutoID::defaultGenerator();
         },
+        'break' => 42, // generator loops for uniqueness
     ],
     'pagesMethods' => [ // PAGES not PAGE
         'autoid' => function ($autoid) {
