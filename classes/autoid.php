@@ -20,7 +20,7 @@ class AutoID
         }
         // create new index table on new version of plugin
         if (!static::$indexname) {
-            static::$indexname = 'index'.str_replace('.', '', kirby()->plugin('bnomei/autoid')->version());
+            static::$indexname = 'index'.str_replace('.', '', kirby()->plugin('bnomei/autoid')->version()[0]);
         }
         return static::$cache;
     }

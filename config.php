@@ -11,6 +11,8 @@ Kirby::plugin('bnomei/autoid', [
         'index.pages' => true,
         'index.structures' => true,
         'index.files' => true,
+        // could do 'root' option instead of kirby()->site()
+        // could do 'filter.pages' and 'filter.files' callback (==> $objcollection->filter($callback))
     ],
     'pagesMethods' => [ // PAGES not PAGE
         'autoid' => function ($autoid) {
@@ -28,28 +30,35 @@ Kirby::plugin('bnomei/autoid', [
     ],
     'hooks' => [
         'page.create:after' => function ($page) {
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
             \Bnomei\AutoID::addPage($page);
         },
         'page.update:after' => function ($newPage, $oldPage) {
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
             \Bnomei\AutoID::addPage($page);
         },
         'page.delete:before' => function ($page) {
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
             \Bnomei\AutoID::removePage($page);
         },
         'file.create:after' => function ($file) {
+            if (!option('bnomei.autoid.index.files')) return;
             \Bnomei\AutoID::addFile($file);
         },
         'file.update:after' => function ($newFile, $oldFile) {
+            if (!option('bnomei.autoid.index.files')) return;
             // update filename in index
             \Bnomei\AutoID::removeFile($file);
             \Bnomei\AutoID::addFile($file);
         },
         'file.changeName:after' => function ($newFile, $oldFile) {
+            if (!option('bnomei.autoid.index.files')) return;
             // TODO: will trigger update anyway?
             \Bnomei\AutoID::removeFile($file);
             \Bnomei\AutoID::addFile($file);
         },
         'file.delete:before' => function ($file) {
+            if (!option('bnomei.autoid.index.files')) return;
             \Bnomei\AutoID::removeFile($file);
         },
     ]
