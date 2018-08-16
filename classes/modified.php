@@ -96,6 +96,10 @@ class Modified
                             return self::GROUP_NEEDS_REFRESH;
                         }
                     }
+                } else {
+                    // entry removed
+                    // return group 'needs refresh'
+                    return self::GROUP_NEEDS_REFRESH;
                 }
             }
             // if not returned by now group is still valid
