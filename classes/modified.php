@@ -40,6 +40,7 @@ class Modified
      *  PUBLIC
      */
 
+    private const EXPIRE = 'expire';
     private const OBJECTS = 'objects';
     private const TIMESTAMPS = 'timestamps';
     private const AUTOID = 'autoid';
@@ -53,7 +54,8 @@ class Modified
         }
 
         // TODO: recursive
-        $recursive = \Kirby\Toolkit\A::get($config, 'recursive');
+        $recursive = boolval(\Kirby\Toolkit\A::get($config, 'recursive'));
+        $expire = \time() + intval(\Kirby\Toolkit\A::get($config, 'expire'));
 
         // create list if modified timestamp entires
         $timestamps = [];
@@ -72,6 +74,7 @@ class Modified
         }
 
         $data = [
+            self::EXPIRE => $expire,
             self::OBJECTS => $objects,
             self::TIMESTAMPS => $timestamps,
         ];
@@ -82,6 +85,13 @@ class Modified
 
     public static function findGroup(string $group) {
         if($g = static::getGroup($group)) {
+            $expire = \Kirby\Toolkit\A::get($g, self::EXPIRE);
+            if($expire <= \time()) {
+                // unset group in cache
+                static::setGroup($group, null);
+                // return group 'needs refresh'
+                return self::GROUP_NEEDS_REFRESH;
+            }
             foreach(\Kirby\Toolkit\A::get($g, self::TIMESTAMPS) as $t) {
                 $autoid = \Kirby\Toolkit\A::get($t, self::AUTOID);
                 if ($a = autoid($autoid)) {
@@ -98,6 +108,8 @@ class Modified
                     }
                 } else {
                     // entry removed
+                    // unset group in cache
+                    static::setGroup($group, null);
                     // return group 'needs refresh'
                     return self::GROUP_NEEDS_REFRESH;
                 }

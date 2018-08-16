@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-autoid",
     "type": "plugin",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "",
     "license": "MIT",
     "autoload": {
@@ -16,10 +16,6 @@
         {
             "name": "Bruno Meilick",
             "email": "b@bnomei.com"
-        },
-        {
-            "name": "Thomas Günther",
-            "email": "mail@medienbaecker.com"
         }
     ],
     "repositories": [

@@ -23,7 +23,8 @@ Kirby::plugin('bnomei/autoid', [
             return false;
         },
         'modified' => [
-            'recursive' => true,
+            'recursive' => false,
+            'expire' => 30, // seconds
         ],
     ],
     'pagesMethods' => [ // PAGES not PAGE

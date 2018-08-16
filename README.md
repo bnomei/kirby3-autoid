@@ -86,6 +86,12 @@ You can use the provided blueprints and snippets to get you started with this pl
 **log**
 - default: callback to `kirbyLog()`
 
+**modified[recursive]**
+- default: `false`
+
+**modified[expire]**
+- default: `30` seconds
+
 
 ## Disclaimer
 
