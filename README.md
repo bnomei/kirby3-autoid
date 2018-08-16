@@ -29,6 +29,15 @@ $anyFile = $site->pages()->autoid($anyAutoID);
 dump($anyFile->url());
 ```
 
+## How to test
+
+> NOTE: All this is alpha stage! Do not use in production. 
+
+You can use the provided blueprints and snippets to get you started with this plugin and maybe even contribute an issue. They are not registered by the plugin but just part of the documentation.
+
+- [blueprints](https://github.com/bnomei/kirby3-autoid/tree/master/blueprints)
+- [snippets](https://github.com/bnomei/kirby3-autoid/tree/master/snippets)
+
 ## Settings
 
 **generator**

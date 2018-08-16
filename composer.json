@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-autoid",
     "type": "plugin",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "",
     "license": "MIT",
     "autoload": {
@@ -35,7 +35,8 @@
     },
     "scripts": {
         "build": "composer update; composer dumpautoload -o;",
-        "zip": "rm kirby3-autoid.zip; composer remove getkirby/cms; composer dumpautoload -o; composer archive --format=zip --file=kirby3-autoid; composer require getkirby/cms:'dev-master as 3.0.0'; composer dumpautoload -o;"
+        "archive": "rm kirby3-autoid.zip; composer remove getkirby/cms; composer dumpautoload -o; composer archive --format=zip --file=kirby3-autoid; composer require getkirby/cms:'dev-master as 3.0.0'; composer dumpautoload -o;",
+        "zip": "rm kirby3-autoid.zip; composer update; composer remove getkirby/cms; composer dumpautoload -o; zip -r kirby3-autoid.zip .; composer require getkirby/cms:'dev-master as 3.0.0'; composer dumpautoload -o;"
     },
     "minimum-stability": "beta"
 }
