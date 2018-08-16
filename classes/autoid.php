@@ -1,5 +1,38 @@
 <?php
 
+/*
+    TODO: silent mode for everything without a field on blueprint
+    TODO: seperate index for File
+
+    PRIVATE
+    - cache             kirby cms cache object
+    - index             get index array from cache
+    - rebuildIndex      start crawling
+    - commitEntry       add found autoid entry to tmp array
+    - pushEntries       merge found entries from tmp array with index array
+    - updateIndex       set index array to cache
+    - removeEntry       removes an entry from index array
+    - indexPage         check single page for autoid entries
+    - log               creates a log post (if possible), debug level only on option('debug') == true
+
+    PUBLIC
+    - find              find an entry
+    - collection        return index array as collection
+    - flush             clears the cache
+
+    GENERATOR
+    - cryptoRandSecure  random (from before php7)
+    - getToken          random token
+    - defaultGenerator  2.8 trillion alpha numeric hash
+    - generator         calls config setting generator or default
+
+    HOOK
+    - addPage           will call indexPage on page
+    - removePage        will call removeEntry on page
+    - addFile           will call indexPage on $file->page()
+    - removeFile        will call removeEntry on $file->page()
+*/
+
 namespace Bnomei;
 
 class AutoID
@@ -11,7 +44,6 @@ class AutoID
     }
 
     private static $indexname = null;
-
     private static $cache = null;
     private static function cache(): \Kirby\Cache\Cache
     {
@@ -29,27 +61,32 @@ class AutoID
     private static function index(): array
     {
         $index = static::cache()->get(static::$indexname);
-        if (!$index) {
+        if (!$index && !is_array($index)) {
             $indexed = static::rebuildIndex();
-            // TODO: logging?
         }
         return static::cache()->get(static::$indexname);
     }
 
-    private static function updateIndex(array $index): array
+    public static function rebuildIndex(bool $force = false): int
     {
-        return static::cache()->set(static::$indexname, $index);
-    }
-
-    private static function rebuildIndex(): int
-    {
-        if ($c = static::cache()) {
-            $c->flush();
+        $i = static::cache()->get(static::$indexname);
+        if(!$force && $i) {
+            static::log('rebuildIndex:exists');
+            return count($i);
         }
+        static::log('rebuildIndex:before');
+        static::cache()->flush();
+        static::cache()->set(static::$indexname, []);
         $indexed = 0;
         $entries = [];
+        $root = option('bnomei.autoid.index');
+        if($root && is_callable($root)) {
+            $root = $root();
+        } else {
+            $root = kirby()->pages()->index();
+        }
         // NOTE: this operation will be very slow if index grows
-        foreach (kirby()->pages()->index() as $page) {
+        foreach ($root as $page) {
             $newEntries = static::indexPage($page);
             $indexed += count($newEntries);
             $entries = array_merge($entries, $newEntries);
@@ -57,8 +94,16 @@ class AutoID
         // update cache in one push to improve performance
         // if cache is filebased
         static::pushEntries($entries);
+        static::log('rebuildIndex:after');
         return $indexed;
     }
+
+    private const ID = 'pageid';
+    private const STRUCTURE = 'structure';
+    private const FILENAME = 'filename';
+    private const MODIFIED = 'modified';
+    private const AUTOID = 'autoid';
+    private const TYPE = 'type';
 
     // append autoid data to in memory array
     private static function commitEntry(
@@ -66,22 +111,36 @@ class AutoID
         string $autoid,
         string $pageId,
         string $structureFieldname = null,
-        string $filename = null
+        string $filename = null,
+        int $modified = null
     ): array {
-        // 1 char keys to reduce filesize of cache => more speed
+        $type = 'page';
+        if($structureFieldname) $type = 'structure';
+        if($filename) $type = 'file';
+
         $tmp[$autoid] = [
-            'i' => $pageId,
-            's' => $structureFieldname,
-            'f' => $filename,
+            self::ID => $pageId,
+            self::STRUCTURE => $structureFieldname,
+            self::FILENAME => $filename,
+            self::MODIFIED => $modified,
+            self::AUTOID => $autoid,
+            self::TYPE => $type,
         ];
+        static::log('commitEntry', 'debug', $tmp[$autoid]);
         return $tmp;
     }
 
     // write array of autoid data to cache
     private static function pushEntries($entries): bool
     {
-        $index = array_merge(static::indexPage(), $entries);
+        $index = array_merge(static::index(), $entries);
         return static::updateIndex($index);
+    }
+
+    private static function updateIndex(array $index): bool
+    {
+        static::$collection = null;
+        return static::cache()->set(static::$indexname, $index);
     }
 
     private static function removeEntry($autoid): bool
@@ -89,80 +148,87 @@ class AutoID
         $index = static::cache()->get(static::$indexname);
         if ($index && is_array($index) && \Kirby\Toolkit\A::get($index, $autoid())) {
             unset($index, $autoid);
+            static::$collection = null;
+            static::log('removeEntry', 'debug', $autoid);
             return static::cache()->set(static::$indexname, $index);
         }
         return false;
     }
 
-    private static function indexPage(\Kirby\Cms\Page $page, array $commits = []): int
+    private static function indexPage(\Kirby\Cms\Page $page, array $commits = []): array
     {
+        static::log('indexPage:before', 'debug', ['page.id' => $page->id()]);
+        // kirby()->impersonate(option('bnomei.impersonate.user'));
+
         $commitsPage = [];
         $commitsFiles = [];
         $updatePage = []; // array to update Page-Object with
         $updateFile = []; // array to update Page-Object with
 
+        // TODO: silent mode would just try reading $static::fieldname() AND check all structures
         foreach ($page->blueprint()->fields() as $field) {
-            if (option('bnomei.autoid.index.pages') && $field->key() == static::$fieldname) {
-                if ($field->isEmpty()) {
+            if (option('bnomei.autoid.index.pages') && $field->name() == static::$fieldname) {
+                if (empty($field->value())) {
                     $autoid = static::generator();
-                    $updatePage[] = [
+                    $updatePage = array_merge($updatePage, [
                         static::$fieldname => $autoid
-                    ];
-                    $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id());
+                    ]);
+                    $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), null, null, $page->modified());
                 } else {
-                    $commitsPage = static::commitEntry($commitsPage, $field->value(), $page->id());
+                    $commitsPage = static::commitEntry($commitsPage, $field->value(), $page->id(), null, null, $page->modified());
                 }
             } else if (option('bnomei.autoid.index.structures')) {
                 // make copy as array so can update
                 $data = \Yaml::decode($field->value());
-                // var_dump($data); die(); // TODO: check structures-array structure ;-)
                 $copy = $data; // this is a copy since its an array
                 $hasChange = false;
-                foreach ($data as $structureField) {
-                    // TODO: this probably wrong. key might be numeric sort order. maybe loop through fields in $structureObject?
+                for ($d=0; $d<count($data); $d++) {
+                    $structureField = $data[$d];
                     // TODO: is support for nested structures needed?
-                    if ($structureField['key'] == static::$fieldname) {
-                        // check is is empty or not
-                        $value = \Kirby\Toolkit\A::get($structureField, 'value');
-                        if(empty($value)) {
+                    if (is_array($structureField)) {
+                        $value = \Kirby\Toolkit\A::get($structureField, static::$fieldname);
+                        if (empty($value)) {
                             // update structure in copy
                             $hasChange = true;
                             $autoid = static::generator();
-                            $copy[''][''][static::$fieldname] = $autoid; // TODO: figure this out
-                            $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field->key());
+                            $copy[$d][static::$fieldname] = $autoid;
+                            $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field->name(), null, $page->modified());
                         } else {
-                            $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field->key());
+                            $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field->name(), null, $page->modified());
                         }
                     }
                 }
+                
                 if($hasChange) {
-                    $updatePage[] = [
-                        $field->key() => \Yaml::encode($copy),
-                    ];
+                    $updatePage = array_merge($updatePage, [
+                        $field->name() => \Yaml::encode($copy),
+                    ]);
                 }
             }
         }
 
         // loop through each File of page and check blueprint and fields
+        
         if (option('bnomei.autoid.index.files')) {
             foreach ($page->files() as $file) {
+                // TODO: silent mode would just try reading $static::fieldname() AND check all structures
                 foreach ($file->blueprint()->fields() as $field) {
-                    if ($field->key() == static::$fieldname) {
-                        if ($field->isEmpty()) {
+                    if ($field->name() == static::$fieldname) {
+                        if (empty($field->value())) {
                             $autoid = static::generator();
                             $updateFile = [
                                 static::$fieldname => $autoid
                             ];
                             
                             try {
+                                kirby()->impersonate(option('bnomei.impersonate.user'));
                                 $file->update($updateFile);
-                                $commitsFiles = static::commitEntry($commitsFiles, $autoid, $page->id(), null, $file->filename());  // TODO: name or filename?
+                                $commitsFiles = static::commitEntry($commitsFiles, $autoid, $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
                             } catch (Exception $e) {
-                                // echo $e->getMessage();
-                                // TODO: throw exception again?
+                                static::log($e->getMessage(), 'error', ['page.id' => $page->id(), 'filename' => $file->filename()]);
                             }
                         } else {
-                            $commitsFiles = static::commitEntry($commitsFiles, $field->value(), $page->id(), null, $file->filename());  // TODO: name or filename?
+                            $commitsFiles = static::commitEntry($commitsFiles, $field->value(), $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
                         }
                     }
                 }
@@ -171,34 +237,70 @@ class AutoID
         
         try {
             if (count($updatePage) > 0) {
+                kirby()->impersonate(option('bnomei.impersonate.user'));
                 $page->update($updatePage);
             }
         } catch (Exception $e) {
-            // echo $e->getMessage();
-            // TODO: throw exception again?
+            static::log($e->getMessage(), 'error', [$page->id()]);
             $commitsPage = []; // reset since failed
+            static::log('commits to page reset', 'debug', ['page.id' => $page->id()]);
         }
+
+        static::log('indexPage:after', 'debug', ['page.id' => $page->id()]);
         return array_merge($commits, $commitsPage, $commitsFiles);
     }
+
+    private static function log(string $msg = '', string $level = 'info', array $context = []):bool {
+        $log = option('bnomei.autoid.log');
+        if($log && is_callable($log)) {
+            if (!option('debug') && $level == 'debug') {
+                // skip but...
+                return true;
+            } else {
+                return $log($msg, $level, $context);
+            }
+        }
+        return false;
+    }
+
+    /****************************************************************
+     * PUBLIC find, collection
+     */
 
     public static function find($autoid)
     {
         if ($entry = \Kirby\Toolkit\A::get(static::index(), $autoid)) {
-            if ($page = \page(\Kirby\Toolkit\A::get($entry, 'i'))) {
-                if ($structureField = \Kirby\Toolkit\A::get($entry, 's')) {
-                    foreach($page->${$structureField}()->toStructure() as $structureObject) {
-                        // TODO: this probably wrong. key might be numeric sort order. maybe loop through fields in $structureObject?
-                        if($structureObject->key() == static::$fieldname {
+            if ($page = \page(\Kirby\Toolkit\A::get($entry, self::ID))) {
+                if ($structureField = \Kirby\Toolkit\A::get($entry, self::STRUCTURE)) {
+                    foreach($page->$structureField()->toStructure() as $structureObject) {
+                        $field = static::$fieldname;
+                        if($structureObject->$field()) {
+                            static::log('found structure', 'debug', ['autoid' => $autoid]);
                             return $structureObject;
                         }
                     }
-                } elseif ($filename = \Kirby\Toolkit\A::get($entry, 'f')) {
+                } elseif ($filename = \Kirby\Toolkit\A::get($entry, self::FILENAME)) {
+                    static::log('found file', 'debug', ['autoid' => $autoid]);
                     return $page->file($filename);
                 }
+                static::log('found page', 'debug', ['autoid' => $autoid]);
                 return $page;
             }
         }
+        static::log('autoid not found', 'warning', ['autoid' => $autoid]);
         return null;
+    }
+
+    private static $collection = null;
+    public static function collection() {
+        if (!static::$collection) {
+            static::$collection = new \Kirby\Toolkit\Collection(static::index());
+        }
+        return static::$collection;
+    }
+
+    public static function flush() {
+        return static::cache()->flush();
     }
 
     /****************************************************************
@@ -261,12 +363,12 @@ class AutoID
             $hash = static::defaultGenerator();
         }
         // if custom generator is not unique enough give it a few tries
-        $break = option('bnomei.autoid.generator.break');
+        $break = intval(option('bnomei.autoid.generator.break'));
         while($break > 0 && \Kirby\Toolkit\A::get(static::index(), $hash) != null) {
             $hash = static::generator($seed);
             $break--;
             if($break == 0) {
-                // TODO: throw exception and/or do logging?
+                static::log('generator.break hit. fallback to defaultGenerator.', 'warning', ['break' => intval(option('bnomei.autoid.generator.break'))]);
                 $hash = static::defaultGenerator();
             }
         }
