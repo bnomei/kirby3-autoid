@@ -11,6 +11,7 @@ $result = $kirby->pages()->autoid($autoid);
 $result = Bnomei\AutoID::find($autoid);
 // or
 $result = autoid($autoid);
+dump($result);
 
 if(is_a($result, 'Kirby\Cms\Page')) {
     // got a page
@@ -19,6 +20,13 @@ if(is_a($result, 'Kirby\Cms\Page')) {
 } else if(is_a($result, 'Kirby\Cms\File')) {
     // got a File
 }
+
+// get collection
+foreach(autoid() as $a) { dump($a); }
+
+$anyAutoID = autoid()->filterBy('type', 'file')->shuffle()->first()['autoid'];
+$anyFile = $site->pages()->autoid($anyAutoID);
+dump($anyFile->url());
 ```
 
 ## Settings
@@ -37,6 +45,15 @@ if(is_a($result, 'Kirby\Cms\Page')) {
 
 **index.files**
 - default: `true`
+
+**index**
+- default: `kirby()->site()->pages()->index()` in callback
+
+**log.enabled**
+- default: `false`
+
+**log**
+- default: callback to `kirbyLog()`
 
 
 ## Disclaimer

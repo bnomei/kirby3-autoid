@@ -3,7 +3,6 @@
 Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
-        'impersonate.user' => 'kirby',
         'generator' => function (string $seed = null) {
             // override with custom callback if needed
             return \Bnomei\AutoID::defaultGenerator();
@@ -15,8 +14,9 @@ Kirby::plugin('bnomei/autoid', [
         'index' => function():\Kirby\Cms\Pages {
             return kirby()->site()->pages()->index();
         },
+        'log.enabled' => false,
         'log' => function(string $msg, string $level = 'info', array $context = []):bool {
-            if(function_exists('kirbyLog')) {
+            if(option('bnomei.autoid.log.enabled') && function_exists('kirbyLog')) {
                 kirbyLog('bnomei.autoid.log')->log($msg, $level, $context);
                 return true;
             }
@@ -32,7 +32,8 @@ Kirby::plugin('bnomei/autoid', [
         'autoid' => [
           'props' => [
             'autoid' => function () {
-              return $this->${\Bnomei\AutoID::fieldname()}();
+                $fieldname = \Bnomei\AutoID::fieldname();
+                return $this->$fieldname();
             }
           ]
         ]
@@ -50,10 +51,10 @@ Kirby::plugin('bnomei/autoid', [
             if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
             \Bnomei\AutoID::removePage($page);
         },
-        // 'file.create:after' => function ($file) {
-        //     if (!option('bnomei.autoid.index.files')) return;
-        //     \Bnomei\AutoID::addFile($file);
-        // },
+        'file.create:after' => function ($file) {
+            if (!option('bnomei.autoid.index.files')) return;
+            \Bnomei\AutoID::addFile($file);
+        },
         'file.update:after' => function ($newFile, $oldFile) {
             if (!option('bnomei.autoid.index.files')) return;
             // update filename in index
@@ -72,6 +73,10 @@ Kirby::plugin('bnomei/autoid', [
         },
     ]
 ]);
+
+if(!class_exists('Bnomei\AutoID')) {
+    require_once __DIR__ . '/classes/autoid.php';
+}
 
 if(!function_exists('autoid')) {
     function autoid($obj = null) {
@@ -100,6 +105,10 @@ if(!function_exists('autoid')) {
         }
     }
 }
+
+// if(!class_exists('Bnomei\Modified')) {
+//     require_once __DIR__ . '/classes/modified.php';
+// }
 
 // if(!function_exists('modified')) {
 //     function modified(string $group, $objects = null, $options = null) {

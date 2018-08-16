@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-autoid",
     "type": "plugin",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "",
     "license": "MIT",
     "autoload": {

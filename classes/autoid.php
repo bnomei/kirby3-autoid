@@ -2,7 +2,8 @@
 
 /*
     TODO: silent mode for everything without a field on blueprint
-    TODO: seperate index for File
+    TODO: seperate index function for File
+    TODO: rebuildIndex cache is public for dev
 
     PRIVATE
     - cache             kirby cms cache object
@@ -158,7 +159,7 @@ class AutoID
     private static function indexPage(\Kirby\Cms\Page $page, array $commits = []): array
     {
         static::log('indexPage:before', 'debug', ['page.id' => $page->id()]);
-        // kirby()->impersonate(option('bnomei.impersonate.user'));
+        // kirby()->impersonate('kirby');
 
         $commitsPage = [];
         $commitsFiles = [];
@@ -221,7 +222,7 @@ class AutoID
                             ];
                             
                             try {
-                                kirby()->impersonate(option('bnomei.impersonate.user'));
+                                kirby()->impersonate('kirby');
                                 $file->update($updateFile);
                                 $commitsFiles = static::commitEntry($commitsFiles, $autoid, $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
                             } catch (Exception $e) {
@@ -237,7 +238,7 @@ class AutoID
         
         try {
             if (count($updatePage) > 0) {
-                kirby()->impersonate(option('bnomei.impersonate.user'));
+                kirby()->impersonate('kirby');
                 $page->update($updatePage);
             }
         } catch (Exception $e) {
@@ -400,7 +401,8 @@ class AutoID
 
     public static function removeFile(\Kirby\Cms\File $file): bool
     {
-        $field = $file->${static::$fieldname}();
+        $fieldname = static::$fieldname;
+        $field = $file->$fieldname();
         if ($field->isNotEmpty()) {
             return static::removeEntry($field->value());
         }

@@ -1,0 +1,8 @@
+title: Image with AutoID
+
+accept:
+  mime: image/jpeg, image/png, image/svg+xml
+
+fields:
+  autoid:
+    type: hidden
