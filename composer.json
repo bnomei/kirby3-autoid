@@ -35,7 +35,7 @@
     },
     "scripts": {
         "build": "composer update; composer dumpautoload -o;",
-        "archive": "rm kirby3-autoid.zip; composer remove getkirby/cms; composer dumpautoload -o; composer archive --format=zip --file=kirby3-autoid; composer require getkirby/cms:'dev-master as 3.0.0'; composer dumpautoload -o;",
+        "dev-zip": "rm kirby3-autoid.zip; composer remove getkirby/cms; composer dumpautoload -o; composer archive --format=zip --file=kirby3-autoid; composer require getkirby/cms:'dev-master as 3.0.0'; composer dumpautoload -o;",
         "zip": "rm kirby3-autoid.zip; composer update; composer remove getkirby/cms; composer dumpautoload -o; zip -r kirby3-autoid.zip .; composer require getkirby/cms:'dev-master as 3.0.0'; composer dumpautoload -o;"
     },
     "minimum-stability": "beta"
