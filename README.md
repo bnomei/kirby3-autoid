@@ -1,8 +1,8 @@
 # Kirby 3 AutoID
 
-Performant index of Pages, StructureObjects and Files.
+Performant index of Pages, StructureObjects and Files. Cache for Page- and File-Collection.
 
-## Usage
+## Usage autoid()
 
 ```php
 $autoid = 'any-autoid-value';
@@ -27,6 +27,28 @@ foreach(autoid() as $a) { dump($a); }
 $anyAutoID = autoid()->filterBy('type', 'file')->shuffle()->first()['autoid'];
 $anyFile = $site->pages()->autoid($anyAutoID);
 dump($anyFile->url());
+```
+
+## usage modified()
+
+```php
+// setup a semi-unique id for this group
+$collectionID = "page('autoid')->children()->visible()";
+
+// get cached collection, returns null if modified
+$collection = modified($collectionID);
+
+// if does not exist yet or was modified 
+if(!$collection) {
+  $collection = modified($collectionID, page('autoid')->children()->visible());
+  echo '=> Collection Cache: created or refreshed because modified.'.PHP_EOL;
+} else {
+  echo '=> Collection Cache: read.'.PHP_EOL;
+}
+
+foreach($collection as $p) {
+  dump($p->url());
+}
 ```
 
 ## How to test

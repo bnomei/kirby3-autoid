@@ -21,7 +21,10 @@ Kirby::plugin('bnomei/autoid', [
                 return true;
             }
             return false;
-        }
+        },
+        'modified' => [
+            'recursive' => true,
+        ],
     ],
     'pagesMethods' => [ // PAGES not PAGE
         'autoid' => function ($autoid) {
@@ -106,16 +109,21 @@ if(!function_exists('autoid')) {
     }
 }
 
-// if(!class_exists('Bnomei\Modified')) {
-//     require_once __DIR__ . '/classes/modified.php';
-// }
+if(!class_exists('Bnomei\Modified')) {
+    require_once __DIR__ . '/classes/modified.php';
+}
 
-// if(!function_exists('modified')) {
-//     function modified(string $group, $objects = null, $options = null) {
-//         if(is_array($objects) && count($objects) > 0) {
-//             return \Bnomei\Modified::registerGroup($group, $objects, $options); // bool or null
-//         } else {
-//             return \Bnomei\Modified::isGroupModified($group); // bool or null
-//         }
-//     }
-// }
+if(!function_exists('modified')) {
+    function modified(string $group, $objects = null, $options = null) {
+
+        $result = \Bnomei\Modified::findGroup($group);
+
+        if(!$objects && !$result) {
+            return null;
+        } elseif (!$objects && $result) {
+            return $result;
+        } else {
+            return \Bnomei\Modified::registerGroup($group, $objects, $options);
+        }
+    }
+}
