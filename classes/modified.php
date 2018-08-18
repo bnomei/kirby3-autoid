@@ -25,6 +25,7 @@ class Modified
         }
         return static::$cache;
     }
+    
 
     private static function getGroup(string $group) 
     {
@@ -39,6 +40,11 @@ class Modified
     /* 
      *  PUBLIC
      */
+
+    public static function flush()
+    {
+        return static::cache()->flush();
+    }
 
     private const EXPIRE = 'expire';
     private const OBJECTS = 'objects';
@@ -60,22 +66,24 @@ class Modified
         // create list if modified timestamp entires
         $timestamps = [];
 
+        $arraykeys = [];
+        $autoidArray = \Bnomei\AutoID::array();
+        $fieldname = \Bnomei\AutoID::fieldname();
         foreach($objects as $obj) {
-            $fieldname = \Bnomei\AutoID::fieldname();
-            $autoid = $obj->$fieldname();
-            if ($a = autoid($autoid)) {
-                if (is_a($a, 'Kirby\Cms\Page') || is_a($a, 'Kirby\Cms\File')) {
-                    $timestamps[] = [
-                        self::AUTOID => $autoid->value(),
-                        self::MODIFIED => $obj->modified(),
-                    ];
-                }
+            $autoid = (string) trim($obj->$fieldname()->value());
+            $a = \Kirby\Toolkit\A::get($autoidArray, $autoid);
+            $arraykeys[] = (string) $obj->id();
+            if ($a) {
+                $timestamps[] = [
+                    self::AUTOID => $autoid,
+                    self::MODIFIED => \Kirby\Toolkit\A::get($a, \Bnomei\AutoID::MODIFIED),
+                ];
             }
         }
 
         $data = [
             self::EXPIRE => $expire,
-            self::OBJECTS => $objects,
+            self::OBJECTS => $arraykeys, // array_keys($objects->toArray()), <= too slow
             self::TIMESTAMPS => $timestamps,
         ];
         
@@ -92,19 +100,19 @@ class Modified
                 // return group 'needs refresh'
                 return self::GROUP_NEEDS_REFRESH;
             }
+            $autoidArray = \Bnomei\AutoID::array();
             foreach(\Kirby\Toolkit\A::get($g, self::TIMESTAMPS) as $t) {
                 $autoid = \Kirby\Toolkit\A::get($t, self::AUTOID);
-                if ($a = autoid($autoid)) {
-                    if (is_a($a, 'Kirby\Cms\Page') || is_a($a, 'Kirby\Cms\File')) {
-                        $oldModified = \Kirby\Toolkit\A::get($t, self::MODIFIED);
-                        $newModified = $a->modified();
-                        // break on any modified entry
-                        if($oldModified != $newModified) {
-                            // unset group in cache
-                            static::setGroup($group, null);
-                            // return group 'needs refresh'
-                            return self::GROUP_NEEDS_REFRESH;
-                        }
+                $a = \Kirby\Toolkit\A::get($autoidArray, $autoid);
+                if ($a) {
+                    $oldModified = \Kirby\Toolkit\A::get($t, self::MODIFIED);
+                    $newModified = \Kirby\Toolkit\A::get($a, \Bnomei\AutoID::MODIFIED);
+                    // break on any modified entry
+                    if($oldModified != $newModified) {
+                        // unset group in cache
+                        static::setGroup($group, null);
+                        // return group 'needs refresh'
+                        return self::GROUP_NEEDS_REFRESH;
                     }
                 } else {
                     // entry removed
@@ -115,7 +123,11 @@ class Modified
                 }
             }
             // if not returned by now group is still valid
-            return \Kirby\Toolkit\A::get($g, self::OBJECTS);
+            $arrayOfPages = array_map(function ($p) {
+                return page($p);
+            }, \Kirby\Toolkit\A::get($g, self::OBJECTS));
+
+            return new \Kirby\Cms\Pages($arrayOfPages);
         }
         // if group not found return 'needs refresh'
         return self::GROUP_NEEDS_REFRESH;

@@ -19,6 +19,7 @@
     PUBLIC
     - find              find an entry
     - collection        return index array as collection
+    - array             return index array as array
     - flush             clears the cache
 
     GENERATOR
@@ -88,6 +89,7 @@ class AutoID
         }
         // NOTE: this operation will be very slow if index grows
         foreach ($root as $page) {
+            set_time_limit(0);
             $newEntries = static::indexPage($page);
             $indexed += count($newEntries);
             $entries = array_merge($entries, $newEntries);
@@ -99,12 +101,12 @@ class AutoID
         return $indexed;
     }
 
-    private const ID = 'pageid';
-    private const STRUCTURE = 'structure';
-    private const FILENAME = 'filename';
-    private const MODIFIED = 'modified';
-    private const AUTOID = 'autoid';
-    private const TYPE = 'type';
+    public const ID = 'pageid';
+    public const STRUCTURE = 'structure';
+    public const FILENAME = 'filename';
+    public const MODIFIED = 'modified';
+    public const AUTOID = 'autoid';
+    public const TYPE = 'type';
 
     // append autoid data to in memory array
     private static function commitEntry(
@@ -135,12 +137,14 @@ class AutoID
     private static function pushEntries($entries): bool
     {
         $index = array_merge(static::index(), $entries);
+        ksort($index); // will speed up getting data by a fraction
         return static::updateIndex($index);
     }
 
     private static function updateIndex(array $index): bool
     {
         static::$collection = null;
+        static::$array = null;
         return static::cache()->set(static::$indexname, $index);
     }
 
@@ -150,6 +154,7 @@ class AutoID
         if ($index && is_array($index) && \Kirby\Toolkit\A::get($index, $autoid())) {
             unset($index, $autoid);
             static::$collection = null;
+            static::$array = null;
             static::log('removeEntry', 'debug', $autoid);
             return static::cache()->set(static::$indexname, $index);
         }
@@ -298,6 +303,14 @@ class AutoID
             static::$collection = new \Kirby\Toolkit\Collection(static::index());
         }
         return static::$collection;
+    }
+
+    private static $array = null;
+    public static function array() {
+        if (!static::$array) {
+            static::$array = static::index();
+        }
+        return static::$array;
     }
 
     public static function flush() {
