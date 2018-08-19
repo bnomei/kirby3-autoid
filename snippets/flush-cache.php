@@ -1,4 +1,5 @@
 <?php
 
 \Bnomei\AutoID::flush();
-\Bnomei\AutoID::rebuildIndex(true); // force
+\Bnomei\Modified::flush();
+\Bnomei\AutoID::rebuildIndex(true);  // force
