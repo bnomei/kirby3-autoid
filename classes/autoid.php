@@ -173,6 +173,7 @@ class AutoID
 
         // TODO: silent mode would just try reading $static::fieldname() AND check all structures
         foreach ($page->blueprint()->fields() as $field) {
+
             if (option('bnomei.autoid.index.pages') && $field->name() == static::$fieldname) {
                 if (empty($field->value())) {
                     $autoid = static::generator();
@@ -183,24 +184,26 @@ class AutoID
                 } else {
                     $commitsPage = static::commitEntry($commitsPage, $field->value(), $page->id(), null, null, $page->modified());
                 }
-            } else if (option('bnomei.autoid.index.structures')) {
+            } else if (option('bnomei.autoid.index.structures') && $field->type() == 'structure') {
                 // make copy as array so can update
                 $data = \Yaml::decode($field->value());
                 $copy = $data; // this is a copy since its an array
                 $hasChange = false;
                 for ($d=0; $d<count($data); $d++) {
-                    $structureField = $data[$d];
+                    $structureObject = $data[$d];
                     // TODO: is support for nested structures needed?
-                    if (is_array($structureField)) {
-                        $value = \Kirby\Toolkit\A::get($structureField, static::$fieldname);
-                        if (empty($value)) {
-                            // update structure in copy
-                            $hasChange = true;
-                            $autoid = static::generator();
-                            $copy[$d][static::$fieldname] = $autoid;
-                            $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field->name(), null, $page->modified());
-                        } else {
-                            $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field->name(), null, $page->modified());
+                    if (is_array($structureObject)) {
+                        if(array_key_exists(static::$fieldname, $structureObject)) {
+                            $value = \Kirby\Toolkit\A::get($structureObject, static::$fieldname);
+                            if (empty($value)) {
+                                // update structure in copy
+                                $hasChange = true;
+                                $autoid = static::generator();
+                                $copy[$d][static::$fieldname] = $autoid;
+                                $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field->name(), null, $page->modified());
+                            } else {
+                                $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field->name(), null, $page->modified());
+                            }
                         }
                     }
                 }
