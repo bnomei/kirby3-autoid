@@ -32,6 +32,11 @@ Kirby::plugin('bnomei/autoid', [
             return \Bnomei\AutoID::find($autoid);
         },
     ],
+    'fieldMethods' => [
+        'fromAutoID' => function ($field) {
+            return \Bnomei\AutoID::find((string)$field->value);
+        },
+    ],
     'fields' => [
         'autoid' => [
           'props' => [
