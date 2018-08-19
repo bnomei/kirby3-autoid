@@ -1,6 +1,11 @@
 # Kirby 3 AutoID
 
+![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-autoid.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg)
+
 Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections.
+
+This plugin is free but if you use it in a commercial project please consider to [make a donation 🍻](https://www.paypal.me/bnomei/5).
+
 
 ## Why AutoID
 
