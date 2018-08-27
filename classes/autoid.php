@@ -227,7 +227,8 @@ class AutoID
                 // TODO: silent mode would just try reading $static::fieldname() AND check all structures
                 foreach ($file->blueprint()->fields() as $field) {
                     if ($field['name'] == static::fieldname()) {
-                        $autoidField = $file->self::$fieldname;
+                        $f = self::fieldname();
+                        $autoidField = $file->$f();
                         if ($autoidField->isEmpty()) {
                             $autoid = static::generator();
                             $updateFile = [
@@ -408,7 +409,8 @@ class AutoID
 
     public static function removePage(\Kirby\Cms\Page $page): bool
     {
-        $field = $page->self::$fieldname;
+        $f = static::fieldname();
+        $field = $page->$f();
         if ($field->isNotEmpty()) {
             return static::removeEntry($field->value());
         }
@@ -422,7 +424,8 @@ class AutoID
 
     public static function removeFile(\Kirby\Cms\File $file): bool
     {
-        $field = $file->self::$fieldname;
+        $f = static::fieldname();
+        $field = $file->$f();
         if ($field->isNotEmpty()) {
             return static::removeEntry($field->value());
         }
