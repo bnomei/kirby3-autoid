@@ -174,61 +174,66 @@ class AutoID
         // TODO: silent mode would just try reading $static::fieldname() AND check all structures
         foreach ($page->blueprint()->fields() as $field) {
 
-            if (option('bnomei.autoid.index.pages') && $field->name() == static::$fieldname) {
-                if (empty($field->value())) {
+            if (option('bnomei.autoid.index.pages') && $field['name'] == static::fieldname()) {
+                $f = $field['name'];
+                $autoidField = $page->$f();
+                if ($autoidField->isEmpty()) {
                     $autoid = static::generator();
                     $updatePage = array_merge($updatePage, [
-                        static::$fieldname => $autoid
+                        static::fieldname() => $autoid
                     ]);
                     $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), null, null, $page->modified());
                 } else {
-                    $commitsPage = static::commitEntry($commitsPage, $field->value(), $page->id(), null, null, $page->modified());
+                    $commitsPage = static::commitEntry($commitsPage, $autoidField->value(), $page->id(), null, null, $page->modified());
                 }
-            } else if (option('bnomei.autoid.index.structures') && $field->type() == 'structure') {
+            } else if (option('bnomei.autoid.index.structures') && $field['type'] == 'structure') {
                 // make copy as array so can update
-                $data = \Yaml::decode($field->value());
+                $f = $field['name'];
+                $structureFieldValue = $page->$f()->value();
+                $data = \Yaml::decode($structureFieldValue);
                 $copy = $data; // this is a copy since its an array
                 $hasChange = false;
                 for ($d=0; $d<count($data); $d++) {
                     $structureObject = $data[$d];
                     // TODO: is support for nested structures needed?
                     if (is_array($structureObject)) {
-                        if(array_key_exists(static::$fieldname, $structureObject)) {
-                            $value = \Kirby\Toolkit\A::get($structureObject, static::$fieldname);
+                        if(array_key_exists(static::fieldname(), $structureObject)) {
+                            $value = \Kirby\Toolkit\A::get($structureObject, static::fieldname());
                             if (empty($value)) {
                                 // update structure in copy
                                 $hasChange = true;
                                 $autoid = static::generator();
-                                $copy[$d][static::$fieldname] = $autoid;
-                                $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field->name(), null, $page->modified());
+                                $copy[$d][static::fieldname()] = $autoid;
+                                $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field['name'], null, $page->modified());
                             } else {
-                                $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field->name(), null, $page->modified());
+                                $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field['name'], null, $page->modified());
                             }
                         }
                     }
                 }
-                
+
                 if($hasChange) {
                     $updatePage = array_merge($updatePage, [
-                        $field->name() => \Yaml::encode($copy),
+                        $field['name'] => \Yaml::encode($copy),
                     ]);
                 }
             }
         }
 
         // loop through each File of page and check blueprint and fields
-        
+
         if (option('bnomei.autoid.index.files')) {
             foreach ($page->files() as $file) {
                 // TODO: silent mode would just try reading $static::fieldname() AND check all structures
                 foreach ($file->blueprint()->fields() as $field) {
-                    if ($field->name() == static::$fieldname) {
-                        if (empty($field->value())) {
+                    if ($field['name'] == static::fieldname()) {
+                        $autoidField = $file->self::$fieldname;
+                        if ($autoidField->isEmpty()) {
                             $autoid = static::generator();
                             $updateFile = [
-                                static::$fieldname => $autoid
+                                static::fieldname() => $autoid
                             ];
-                            
+
                             try {
                                 kirby()->impersonate('kirby');
                                 $file->update($updateFile);
@@ -237,13 +242,13 @@ class AutoID
                                 static::log($e->getMessage(), 'error', ['page.id' => $page->id(), 'filename' => $file->filename()]);
                             }
                         } else {
-                            $commitsFiles = static::commitEntry($commitsFiles, $field->value(), $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
+                            $commitsFiles = static::commitEntry($commitsFiles, $value, $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
                         }
                     }
                 }
             }
         }
-        
+
         try {
             if (count($updatePage) > 0) {
                 kirby()->impersonate('kirby');
@@ -282,7 +287,7 @@ class AutoID
             if ($page = \page(\Kirby\Toolkit\A::get($entry, self::ID))) {
                 if ($structureField = \Kirby\Toolkit\A::get($entry, self::STRUCTURE)) {
                     foreach($page->$structureField()->toStructure() as $structureObject) {
-                        $field = static::$fieldname;
+                        $field = static::fieldname();
                         if($structureObject->$field()) {
                             static::log('found structure', 'debug', ['autoid' => $autoid]);
                             return $structureObject;
@@ -403,7 +408,7 @@ class AutoID
 
     public static function removePage(\Kirby\Cms\Page $page): bool
     {
-        $field = $page->${static::$fieldname}();
+        $field = $page->self::$fieldname;
         if ($field->isNotEmpty()) {
             return static::removeEntry($field->value());
         }
@@ -417,8 +422,7 @@ class AutoID
 
     public static function removeFile(\Kirby\Cms\File $file): bool
     {
-        $fieldname = static::$fieldname;
-        $field = $file->$fieldname();
+        $field = $file->self::$fieldname;
         if ($field->isNotEmpty()) {
             return static::removeEntry($field->value());
         }
