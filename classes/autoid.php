@@ -243,7 +243,7 @@ class AutoID
                                 static::log($e->getMessage(), 'error', ['page.id' => $page->id(), 'filename' => $file->filename()]);
                             }
                         } else {
-                            $commitsFiles = static::commitEntry($commitsFiles, $value, $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
+                            $commitsFiles = static::commitEntry($commitsFiles, $autoidField->value(), $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
                         }
                     }
                 }
