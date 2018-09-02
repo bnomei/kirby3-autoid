@@ -151,11 +151,11 @@ class AutoID
     private static function removeEntry($autoid): bool
     {
         $index = static::cache()->get(static::$indexname);
-        if ($index && is_array($index) && \Kirby\Toolkit\A::get($index, $autoid())) {
-            unset($index, $autoid);
+        if ($index && is_array($index) && \Kirby\Toolkit\A::get($index, $autoid)) {
+            static::log('removeEntry', 'debug', ['autoid' => $autoid]);
+            unset($index[$autoid]);
             static::$collection = null;
             static::$array = null;
-            static::log('removeEntry', 'debug', $autoid);
             return static::cache()->set(static::$indexname, $index);
         }
         return false;
