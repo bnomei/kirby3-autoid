@@ -48,10 +48,10 @@ Kirby::plugin('bnomei/autoid', [
         ]
     ],
     'hooks' => [
-        // 'page.create:after' => function ($page) {
-        //     if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
-        //     \Bnomei\AutoID::addPage($page);
-        // },
+        'page.create:after' => function ($page) {
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
+            \Bnomei\AutoID::addPage($page);
+        },
         'page.update:after' => function ($newPage, $oldPage) {
             if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
             \Bnomei\AutoID::addPage($newPage);
