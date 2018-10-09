@@ -11,12 +11,12 @@ Kirby::plugin('bnomei/autoid', [
         'index.pages' => true,
         'index.structures' => true,
         'index.files' => true,
-        'index' => function():\Kirby\Cms\Pages {
+        'index' => function ():\Kirby\Cms\Pages {
             return kirby()->site()->pages()->index();
         },
         'log.enabled' => false,
-        'log' => function(string $msg, string $level = 'info', array $context = []):bool {
-            if(option('bnomei.autoid.log.enabled') && function_exists('kirbyLog')) {
+        'log' => function (string $msg, string $level = 'info', array $context = []):bool {
+            if (option('bnomei.autoid.log.enabled') && function_exists('kirbyLog')) {
                 kirbyLog('bnomei.autoid.log')->log($msg, $level, $context);
                 return true;
             }
@@ -49,82 +49,98 @@ Kirby::plugin('bnomei/autoid', [
     ],
     'hooks' => [
         'page.create:after' => function ($page) {
-            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
+                return;
+            }
             \Bnomei\AutoID::addPage($page);
         },
         'page.update:after' => function ($newPage, $oldPage) {
-            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
+                return;
+            }
+            \Bnomei\AutoID::addPage($newPage);
+        },
+        'page.changeSlug:after' => function ($newPage, $oldPage) {
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
+                return;
+            }
             \Bnomei\AutoID::addPage($newPage);
         },
         'page.delete:before' => function ($page) {
-            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) return;
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
+                return;
+            }
             \Bnomei\AutoID::removePage($page);
         },
         'file.create:after' => function ($file) {
-            if (!option('bnomei.autoid.index.files')) return;
+            if (!option('bnomei.autoid.index.files')) {
+                return;
+            }
             \Bnomei\AutoID::addFile($file);
         },
         'file.update:after' => function ($newFile, $oldFile) {
-            if (!option('bnomei.autoid.index.files')) return;
+            if (!option('bnomei.autoid.index.files')) {
+                return;
+            }
             // update filename in index
             \Bnomei\AutoID::removeFile($oldFile);
             \Bnomei\AutoID::addFile($newFile);
         },
         'file.changeName:after' => function ($newFile, $oldFile) {
-            if (!option('bnomei.autoid.index.files')) return;
+            if (!option('bnomei.autoid.index.files')) {
+                return;
+            }
             // TODO: will trigger update anyway?
             \Bnomei\AutoID::removeFile($oldFile);
             \Bnomei\AutoID::addFile($newFile);
         },
         'file.delete:before' => function ($file) {
-            if (!option('bnomei.autoid.index.files')) return;
+            if (!option('bnomei.autoid.index.files')) {
+                return;
+            }
             \Bnomei\AutoID::removeFile($file);
         },
     ]
 ]);
 
-if(!class_exists('Bnomei\AutoID')) {
+if (!class_exists('Bnomei\AutoID')) {
     require_once __DIR__ . '/classes/autoid.php';
 }
 
-if(!function_exists('autoid')) {
-    function autoid($obj = null) {
+if (!function_exists('autoid')) {
+    function autoid($obj = null)
+    {
         if (is_string($obj)) {
             return \Bnomei\AutoID::find($obj);
-
-        } else if (is_a($obj, 'Kirby\Cms\Field')) {
+        } elseif (is_a($obj, 'Kirby\Cms\Field')) {
             return \Bnomei\AutoID::find($obj->value());
-
-        } else if (is_a($obj, 'Kirby\Cms\Page')) {
+        } elseif (is_a($obj, 'Kirby\Cms\Page')) {
             \Bnomei\AutoID::addPage($obj);
             return \Bnomei\AutoID::find($obj->${\Bnomei\AutoID::fieldname()});
-
-        } else if (is_a($obj, 'Kirby\Cms\StructureObject')) {
+        } elseif (is_a($obj, 'Kirby\Cms\StructureObject')) {
             if ($page = $obj->page()) {
                 \Bnomei\AutoID::addPage($page);
                 return \Bnomei\AutoID::find($obj->${\Bnomei\AutoID::fieldname()});
             }
-
-        } else if (is_a($obj, 'Kirby\Cms\File')) {
+        } elseif (is_a($obj, 'Kirby\Cms\File')) {
             \Bnomei\AutoID::addFile($obj);
             return \Bnomei\AutoID::find($obj->${\Bnomei\AutoID::fieldname()});
-
         } else {
             return \Bnomei\AutoID::collection();
         }
     }
 }
 
-if(!class_exists('Bnomei\Modified')) {
+if (!class_exists('Bnomei\Modified')) {
     require_once __DIR__ . '/classes/modified.php';
 }
 
-if(!function_exists('modified')) {
-    function modified(string $group, $objects = null, $options = null) {
-
+if (!function_exists('modified')) {
+    function modified(string $group, $objects = null, $options = null)
+    {
         $result = \Bnomei\Modified::findGroup($group);
 
-        if(!$objects && !$result) {
+        if (!$objects && !$result) {
             return null;
         } elseif (!$objects && $result) {
             return $result;
