@@ -4,7 +4,7 @@
     PRIVATE
     - cache             gets kirby cache object
     - group             get group by id
-    - registerGroup     
+    - registerGroup
     - isGroupModified
 */
 
@@ -25,19 +25,19 @@ class Modified
         }
         return static::$cache;
     }
-    
 
-    private static function getGroup(string $group) 
+
+    private static function getGroup(string $group)
     {
         return static::cache()->get(static::$indexname . '-' . sha1($group));
     }
 
-    private static function setGroup(string $group, $data) 
+    private static function setGroup(string $group, $data)
     {
         return static::cache()->set(static::$indexname . '-' . sha1($group), $data);
     }
 
-    /* 
+    /*
      *  PUBLIC
      */
 
@@ -86,7 +86,7 @@ class Modified
             self::OBJECTS => $arraykeys, // array_keys($objects->toArray()), <= too slow
             self::TIMESTAMPS => $timestamps,
         ];
-        
+
         static::setGroup($group, $data);
         return $objects;
     }
@@ -123,11 +123,24 @@ class Modified
                 }
             }
             // if not returned by now group is still valid
-            $arrayOfPages = array_map(function ($p) {
-                return page($p);
-            }, \Kirby\Toolkit\A::get($g, self::OBJECTS));
-
-            return new \Kirby\Cms\Pages($arrayOfPages);
+            $isPageCollection = true;
+            $arrayOfObjects = [];
+            foreach(\Kirby\Toolkit\A::get($g, self::OBJECTS) as $obj) {
+                $object = page($obj);
+                if($object) { // is a page
+                    $arrayOfObjects[] = $object;
+                } else { // try file
+                    if($object = kirby()->file($obj)) {
+                        $isPageCollection = false;
+                        $arrayOfObjects[] = $object;
+                    }
+                }
+            }
+            if ($isPageCollection) {
+                return new \Kirby\Cms\Pages($arrayOfObjects);
+            } else {
+                return new \Kirby\Cms\Files($arrayOfObjects);
+            }
         }
         // if group not found return 'needs refresh'
         return self::GROUP_NEEDS_REFRESH;
