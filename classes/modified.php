@@ -91,6 +91,19 @@ class Modified
         return $objects;
     }
 
+    public static function modifiedGroup(string $group) {
+        $mod = '';
+        if ($g = static::getGroup($group)) {
+            foreach (\Kirby\Toolkit\A::get($g, self::TIMESTAMPS) as $t) {
+                $mod .= \Kirby\Toolkit\A::get($t, self::MODIFIED);
+            }
+        }
+        if(strlen($mod) > 0) {
+            return md5($mod);
+        }
+        return null;
+    }
+
     public static function findGroup(string $group) {
         if($g = static::getGroup($group)) {
             $expire = \Kirby\Toolkit\A::get($g, self::EXPIRE);

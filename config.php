@@ -149,3 +149,10 @@ if (!function_exists('modified')) {
         }
     }
 }
+
+if (!function_exists('modifiedHash')) {
+    function modifiedHash(string $group)
+    {
+        return \Bnomei\Modified::modifiedGroup($group);
+    }
+}

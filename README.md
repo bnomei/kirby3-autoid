@@ -179,6 +179,20 @@ foreach($collection as $p) {
 }
 ```
 
+## usage modifiedHash()
+
+If you are using some kind of [caching like my lapse plugin](https://github.com/bnomei/kirby3-lapse) you need a way to check if the collection changed. You can use the `modifiedHash()` helper to do that. It returns a unified hash for modified values using the almost zero-cpu-cost lookup-table of autoid.
+
+```php
+// continuing example from above...
+$collectionHash = modifiedHash($collectionID);
+
+$data = lapse(md5($page->id().$page->modified().$collectionHash), function () use ($site, $page, $kirby, $collection) {
+    // do something with $page and $collection.
+    // but if any are modified this cache is cleared since the id for lapse() based on the modified hashes changed.
+}
+```
+
 ## How to test
 
 > NOTE: All this is alpha stage! Do not use in production. 
@@ -194,7 +208,7 @@ You can use the provided blueprints and snippets to get you started with this pl
 - default: alphanumeric hash value generator (~2.8 trillion possibilites)
 
 **generator.break**
-- default: try `42` times to generate and verify uniqueness oh hash
+- default: try `42` times to generate and verify uniqueness of hash
 
 **index.pages**
 - default: `true`
