@@ -165,7 +165,7 @@ So how to solve that? In caching what takes up the most CPU time using Collectio
 
 > Note: Collections are not only problem here. Use your own judgment and messasure time spend on calls. You can do that with plain `round(microtime(true) * 1000)` or tools like xdebug and [webgrind](https://github.com/jokkedk/webgrind).
 
-> ATTENTION: Please be aware the the `modified()` helper [does not notice a change in collection object count](https://github.com/bnomei/kirby3-autoid/issues/2) yet. I am still working on this.
+> ATTENTION: Please be aware the the `modified()` helper [does not notice a change in collection object count](https://github.com/bnomei/kirby3-autoid/issues/2) yet. I am still working on this. This is currently solved by a very short expiration time.
 
 ## Usage modified()
 
