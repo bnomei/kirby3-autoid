@@ -25,7 +25,7 @@ To sum it up with AutoID you can solve problems like these:
 
 ## Setup
 
-Add a Field named `autoid` with type `hidden` to your blueprints. More examples can be found [here](https://github.com/bnomei/kirby3-autoid/tree/master/blueprints).
+Add a Field named `autoid` with type `hidden` to your blueprints. Also set `translate: false` unless you need different autoids for different languages. More examples can be found [here](https://github.com/bnomei/kirby3-autoid/tree/master/blueprints).
 
 ```yaml
  content:
@@ -34,18 +34,20 @@ Add a Field named `autoid` with type `hidden` to your blueprints. More examples 
     text:
       type: textarea
     autoid:             # <-------
-      type: hidden      
+      type: hidden
+      translate: false      
     anystructure:
       type: structure
       fields:
         text:
           type: text
         autoid:         # <-------
-          type: hidden 
+          type: hidden
+          translate: false 
 ```
 
-> ALPHA: AutoID has no working custom Field yet. It just uses the core `hidden`-type. Or use a readonly `text`.
-> BETA: Will have a custom Field to display value in panel but using `hidden` will keep on working.
+> AutoID has no working custom Field yet. It just uses the core `hidden`-type. Or use a readonly `text`.
+> Maybe later it will have a custom Field to display value in panel but using `hidden` will keep on working.
 
 ## Usage autoid()
 
@@ -87,6 +89,7 @@ categories:
       type: text
     autoid:
       type: hidden
+      translate: false
 ```
 
 **Page 'b'**
@@ -162,7 +165,9 @@ So how to solve that? In caching what takes up the most CPU time using Collectio
 
 > Note: Collections are not only problem here. Use your own judgment and messasure time spend on calls. You can do that with plain `round(microtime(true) * 1000)` or tools like xdebug and [webgrind](https://github.com/jokkedk/webgrind).
 
-## usage modified()
+> ATTENTION: Please be aware the the `modified()` helper [does not notice a change in collection object count](https://github.com/bnomei/kirby3-autoid/issues/2) yet. I am still working on this.
+
+## Usage modified()
 
 ```php
 // setup a semi-unique id for this group
@@ -184,7 +189,7 @@ foreach($collection as $p) {
 }
 ```
 
-## usage modifiedHash()
+## Usage modifiedHash()
 
 If you are using some kind of [caching like my lapse plugin](https://github.com/bnomei/kirby3-lapse) you need a way to check if the collection changed. You can use the `modifiedHash()` helper to do that. It returns a unified hash for modified values using the almost zero-cpu-cost lookup-table of autoid.
 
@@ -200,7 +205,7 @@ $data = lapse(md5($page->id().$page->modified().$collectionHash), function () us
 
 ## How to test
 
-> NOTE: All this is alpha stage! Do not use in production. 
+> WARNING: Test before you use it in production. 
 
 You can use the provided blueprints and snippets to get you started with this plugin and maybe even contribute an issue. They are not registered by the plugin but just part of the documentation.
 
