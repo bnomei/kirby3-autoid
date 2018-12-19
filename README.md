@@ -257,6 +257,6 @@ It is discouraged to use this plugin in any project that promotes racism, sexism
 
 ## Credits
 
-based on V2 versions of
+based on K2 versions of
 - https://github.com/texnixe/kirby-structure-id
 - https://github.com/helllicht/kirby-autoid
