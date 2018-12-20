@@ -2,7 +2,7 @@
 
 ![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-autoid.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg)
 
-Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections.
+Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections and Tiny-URL.
 
 ## Commercial Usage
 
@@ -10,7 +10,6 @@ This plugin is free but if you use it in a commercial project please consider to
 - [make a donation 🍻](https://www.paypal.me/bnomei/10) or
 - [buy me ☕☕](https://buymeacoff.ee/bnomei) or
 - [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
-
 
 ## Why AutoID
 
@@ -203,6 +202,14 @@ $data = lapse(md5($page->id().$page->modified().$collectionHash), function () us
 }
 ```
 
+## Tiny-URL
+
+```php
+echo $page->url(); // https://devkit.bnomei.com/autoid/test-43422931f00e27337311/test-2efd96419d8ebe1f3230/test-32f6d90bd02babc5cbc3
+echo $page->autoid()->value(); // 8j5g64hh
+echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
+```
+
 ## How to test
 
 > WARNING: Test before you use it in production. 
@@ -232,6 +239,15 @@ You can use the provided blueprints and snippets to get you started with this pl
 **index**
 - default: `kirby()->site()->pages()->index()` in callback
 
+**tinyurl.url**
+- default: callback returning `site()->url()`
+- example: `https://bno.mei`
+
+> TIP: use htaccess on that domain to redirect `RewriteRule (.*) http://devkit.bnomei.com/x/$1 [R=301]`
+
+**tinyurl.folder**
+- default: `x` Tinyurl format: yourdomain/{folder}/{hash}
+
 **log.enabled**
 - default: `false`
 
@@ -260,3 +276,4 @@ It is discouraged to use this plugin in any project that promotes racism, sexism
 based on K2 versions of
 - https://github.com/texnixe/kirby-structure-id
 - https://github.com/helllicht/kirby-autoid
+- K2 core tinyurl implementation

@@ -21,6 +21,7 @@
     - collection        return index array as collection
     - array             return index array as array
     - flush             clears the cache
+    - tinyurl
 
     GENERATOR
     - cryptoRandSecure  random (from before php7)
@@ -324,6 +325,17 @@ class AutoID
 
     public static function flush() {
         return static::cache()->flush();
+    }
+
+    public static function tinyurl($autoid) {
+        $url = option('bnomei.autoid.tinyurl.url');
+        if($url && is_callable($url)) {
+            $url = $url();
+        }
+        if ($url == kirby()->url('index')) {
+            $url = rtrim($url, '/') . '/' . option('bnomei.autoid.tinyurl.folder');
+        }
+        return rtrim($url, '/') . '/' . $autoid;
     }
 
     /****************************************************************

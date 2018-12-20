@@ -26,6 +26,18 @@ Kirby::plugin('bnomei/autoid', [
             'recursive' => false,
             'expire' => 30, // seconds
         ],
+        'tinyurl.url' => function() {
+            return kirby()->url('index');
+        },
+        'tinyurl.folder' => 'x',
+    ],
+    'pageMethods' => [ // PAGE
+        'tinyurl' => function () {
+            $f = \Bnomei\AutoID::fieldname();
+            $field = $this->$f();
+            $autoid = $field->isNotEmpty() ? $field->value() : null;
+            return \Bnomei\AutoID::tinyurl($autoid);
+        },
     ],
     'pagesMethods' => [ // PAGES not PAGE
         'autoid' => function ($autoid) {
@@ -47,6 +59,23 @@ Kirby::plugin('bnomei/autoid', [
           ]
         ]
     ],
+    'routes' => function ($kirby) {
+        $folder = $kirby->option('bnomei.autoid.tinyurl.folder');
+        return [
+            [
+                'pattern' => $folder . '/(:any)',
+                'method' => 'GET',
+                'action' => function($autoid) {
+                    $find = \Bnomei\AutoID::find($autoid);
+                    if($find && is_a($find, 'Kirby\Cms\Page')) {
+                        return \go($find->url(), 302);
+                    } else {
+                        return \go(kirby()->url('index'), 404);
+                    }
+                }
+            ]
+        ];
+    },
     'hooks' => [
         'page.create:after' => function ($page) {
             if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
