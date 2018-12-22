@@ -3,12 +3,12 @@
  */
 
 panel.plugin('bnomei/autoid', {
-    'fields': {
-      'autoid': {
+    fields: {
+      autoid: {
         props: {
-          autoid: String
+          value: String
         },
-        template: '<pre>{{ autoid }}</pre>'
+        template: '<k-text-field v-model="value" name="autoid" label="AutoID" :disabled="true" />'
       }
     }
   });

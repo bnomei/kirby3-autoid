@@ -45,8 +45,7 @@ Add a Field named `autoid` with type `hidden` to your blueprints. Also set `tran
           translate: false 
 ```
 
-> AutoID has no working custom Field yet. It just uses the core `hidden`-type. Or use a readonly `text`.
-> Maybe later it will have a custom Field to display value in panel but using `hidden` will keep on working.
+> This Plugin has an optional Field called `autoid` which is a non-translatable and disabled Text-Field. Use it with `type: autoid`.
 
 ## Usage autoid()
 

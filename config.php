@@ -52,9 +52,8 @@ Kirby::plugin('bnomei/autoid', [
     'fields' => [
         'autoid' => [
           'props' => [
-            'autoid' => function () {
-                $fieldname = \Bnomei\AutoID::fieldname();
-                return $this->$fieldname();
+            'value' => function (string $value = null) {
+                return $value;
             }
           ]
         ]
@@ -133,7 +132,7 @@ Kirby::plugin('bnomei/autoid', [
 ]);
 
 if (!class_exists('Bnomei\AutoID')) {
-    require_once __DIR__ . '/classes/autoid.php';
+    require_once __DIR__ . '/classes/AutoID.php';
 }
 
 if (!function_exists('autoid')) {
@@ -161,7 +160,7 @@ if (!function_exists('autoid')) {
 }
 
 if (!class_exists('Bnomei\Modified')) {
-    require_once __DIR__ . '/classes/modified.php';
+    require_once __DIR__ . '/classes/Modified.php';
 }
 
 if (!function_exists('modified')) {
