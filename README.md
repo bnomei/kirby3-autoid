@@ -11,6 +11,14 @@ This plugin is free but if you use it in a commercial project please consider to
 - [buy me ☕☕](https://buymeacoff.ee/bnomei) or
 - [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
 
+## Installation
+
+- for devkit-setup use `composer require bnomei/kirby3-autoid` or
+- extract latest release of [kirby3-autoid.zip](https://github.com/bnomei/kirby3-autoid/releases/download/v1.2.3/kirby3-autoid.zip) as folder `site/plugins/kirby3-autoid`
+
+> Installation as a gitsubmodule is *not* supported.
+
+
 ## Why AutoID
 
 Kirby does not have a persistent unique id for Page- and File-Objects, which could be usefull in various situations. Using the `$page->id()` will not solve this since it changes when the `$page->slug()` / `$page->url()` changes, Files could get renamed. During K2s livespan web-developers hit the situation that an unique id for entries in Structures would be very helpfull as well since Structures can be used like simplified versions of Pages but changing the sort order them would mess it up.
