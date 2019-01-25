@@ -45,12 +45,13 @@ Add a Field named `autoid` with type `hidden` to your blueprints. Also set `tran
       translate: false      
     anystructure:
       type: structure
+      translate: false
       fields:
         text:
           type: text
         autoid:         # <-------
           type: hidden
-          translate: false 
+          
 ```
 
 > This Plugin has an optional Field called `autoid` which is a non-translatable and disabled Text-Field. Use it with `type: autoid`.
