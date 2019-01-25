@@ -175,7 +175,7 @@ class AutoID
         // TODO: silent mode would just try reading $static::fieldname() AND check all structures
         foreach ($page->blueprint()->fields() as $field) {
 
-            if (option('bnomei.autoid.index.pages') && $field['name'] == static::fieldname()) {
+            if (option('bnomei.autoid.index.pages') && array_key_exists('name', $field) && $field['name'] == static::fieldname()) {
                 $f = $field['name'];
                 $autoidField = $page->$f();
                 if ($autoidField->isEmpty()) {
@@ -187,7 +187,7 @@ class AutoID
                 } else {
                     $commitsPage = static::commitEntry($commitsPage, $autoidField->value(), $page->id(), null, null, $page->modified());
                 }
-            } else if (option('bnomei.autoid.index.structures') && $field['type'] == 'structure') {
+            } else if (option('bnomei.autoid.index.structures') && array_key_exists('type', $field) && array_key_exists('name', $field) && $field['type'] == 'structure') {
                 // make copy as array so can update
                 $f = $field['name'];
                 $structureFieldValue = $page->$f()->value();
@@ -227,7 +227,7 @@ class AutoID
             foreach ($page->files() as $file) {
                 // TODO: silent mode would just try reading $static::fieldname() AND check all structures
                 foreach ($file->blueprint()->fields() as $field) {
-                    if ($field['name'] == static::fieldname()) {
+                    if (array_key_exists('name', $field) && $field['name'] == static::fieldname()) {
                         $f = self::fieldname();
                         $autoidField = $file->$f();
                         if ($autoidField->isEmpty()) {

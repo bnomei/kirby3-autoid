@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-autoid",
     "type": "plugin",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections and Tiny-URL.",
     "license": "MIT",
     "authors": [
@@ -36,12 +36,6 @@
         "optimize-autoloader": true,
         "sort-packages": true
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/k-next/kirby"
-        }
-    ],
     "require": {
         "php": ">=7.1.0",
         "getkirby/cms": "^3.0.0-RC-2.0"
@@ -51,6 +45,7 @@
     },
     "scripts": {
         "zip": [
+            "touch kirby3-autoid.zip",
             "rm kirby3-autoid.zip",
             "composer install --no-dev",
             "composer remove getkirby/cms",
