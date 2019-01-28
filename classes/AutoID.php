@@ -183,9 +183,9 @@ class AutoID
                     $updatePage = array_merge($updatePage, [
                         static::fieldname() => $autoid
                     ]);
-                    $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), null, null, $page->modified());
+                    $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), null, null, $page->modified('U', 'date'));
                 } else {
-                    $commitsPage = static::commitEntry($commitsPage, $autoidField->value(), $page->id(), null, null, $page->modified());
+                    $commitsPage = static::commitEntry($commitsPage, $autoidField->value(), $page->id(), null, null, $page->modified('U', 'date'));
                 }
             } else if (option('bnomei.autoid.index.structures') && array_key_exists('type', $field) && array_key_exists('name', $field) && $field['type'] == 'structure') {
                 // make copy as array so can update
@@ -205,9 +205,9 @@ class AutoID
                                 $hasChange = true;
                                 $autoid = static::generator();
                                 $copy[$d][static::fieldname()] = $autoid;
-                                $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field['name'], null, $page->modified());
+                                $commitsPage = static::commitEntry($commitsPage, $autoid, $page->id(), $field['name'], null, $page->modified('U', 'date'));
                             } else {
-                                $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field['name'], null, $page->modified());
+                                $commitsPage = static::commitEntry($commitsPage, $value, $page->id(), $field['name'], null, $page->modified('U', 'date'));
                             }
                         }
                     }
@@ -239,12 +239,12 @@ class AutoID
                             try {
                                 kirby()->impersonate('kirby');
                                 $file->update($updateFile);
-                                $commitsFiles = static::commitEntry($commitsFiles, $autoid, $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
+                                $commitsFiles = static::commitEntry($commitsFiles, $autoid, $page->id(), null, $file->filename(), $file->modified('U', 'date'));  // TODO: name or filename?
                             } catch (Exception $e) {
                                 static::log($e->getMessage(), 'error', ['page.id' => $page->id(), 'filename' => $file->filename()]);
                             }
                         } else {
-                            $commitsFiles = static::commitEntry($commitsFiles, $autoidField->value(), $page->id(), null, $file->filename(), $file->modified());  // TODO: name or filename?
+                            $commitsFiles = static::commitEntry($commitsFiles, $autoidField->value(), $page->id(), null, $file->filename(), $file->modified('U', 'date'));  // TODO: name or filename?
                         }
                     }
                 }
