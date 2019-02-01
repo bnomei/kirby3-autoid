@@ -431,7 +431,10 @@ class AutoID
 
     public static function addFile(\Kirby\Cms\File $file): bool
     {
-        return static::pushEntries(static::indexPage($file->page()));
+        if ($file->page()) {
+            return static::pushEntries(static::indexPage($file->page()));
+        }
+        return false;
     }
 
     public static function removeFile(\Kirby\Cms\File $file): bool
