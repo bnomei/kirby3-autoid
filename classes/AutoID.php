@@ -290,7 +290,8 @@ class AutoID
                 if ($structureField = \Kirby\Toolkit\A::get($entry, self::STRUCTURE)) {
                     foreach($page->$structureField()->toStructure() as $structureObject) {
                         $field = static::fieldname();
-                        if($structureObject->$field()) {
+                        $sf = $structureObject->$field();
+                        if($sf && $sf->value() == $autoid) {
                             static::log('found structure', 'debug', ['autoid' => $autoid]);
                             return $structureObject;
                         }
