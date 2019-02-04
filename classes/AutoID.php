@@ -432,7 +432,11 @@ class AutoID
 
     public static function addFile(\Kirby\Cms\File $file): bool
     {
-        return static::pushEntries(static::indexPage($file->page()));
+        $p = $file->page();
+        if (!$p) { // https://github.com/bnomei/kirby3-autoid/pull/21
+            return false;
+        }
+        return static::pushEntries(static::indexPage($p));
     }
 
     public static function removeFile(\Kirby\Cms\File $file): bool

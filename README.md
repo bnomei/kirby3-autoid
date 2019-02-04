@@ -14,7 +14,7 @@ This plugin is free but if you use it in a commercial project please consider to
 ## Installation
 
 - for devkit-setup use `composer require bnomei/kirby3-autoid` or
-- extract latest release of [kirby3-autoid.zip](https://github.com/bnomei/kirby3-autoid/releases/download/v1.2.6/kirby3-autoid.zip) as folder `site/plugins/kirby3-autoid`
+- extract latest release of [kirby3-autoid.zip](https://github.com/bnomei/kirby3-autoid/releases/download/v1.2.7/kirby3-autoid.zip) as folder `site/plugins/kirby3-autoid`
 
 > Installation as a gitsubmodule is *not* supported.
 
