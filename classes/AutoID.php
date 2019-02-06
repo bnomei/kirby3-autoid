@@ -73,7 +73,7 @@ class AutoID
     public static function rebuildIndex(bool $force = false): int
     {
         $i = static::cache()->get(static::$indexname);
-        if(!$force && $i) {
+        if (!$force && $i) {
             static::log('rebuildIndex:exists');
             return count($i);
         }
@@ -83,7 +83,7 @@ class AutoID
         $indexed = 0;
         $entries = [];
         $root = option('bnomei.autoid.index');
-        if($root && is_callable($root)) {
+        if ($root && is_callable($root)) {
             $root = $root();
         } else {
             $root = kirby()->pages()->index();
@@ -119,8 +119,12 @@ class AutoID
         int $modified = null
     ): array {
         $type = 'page';
-        if($structureFieldname) $type = 'structure';
-        if($filename) $type = 'file';
+        if ($structureFieldname) {
+            $type = 'structure';
+        }
+        if ($filename) {
+            $type = 'file';
+        }
 
         $tmp[$autoid] = [
             self::ID => $pageId,
@@ -174,7 +178,6 @@ class AutoID
 
         // TODO: silent mode would just try reading $static::fieldname() AND check all structures
         foreach ($page->blueprint()->fields() as $field) {
-
             if (option('bnomei.autoid.index.pages') && array_key_exists('name', $field) && $field['name'] == static::fieldname()) {
                 $f = $field['name'];
                 $autoidField = $page->$f();
@@ -187,7 +190,7 @@ class AutoID
                 } else {
                     $commitsPage = static::commitEntry($commitsPage, $autoidField->value(), $page->id(), null, null, $page->modified('U', 'date'));
                 }
-            } else if (option('bnomei.autoid.index.structures') && array_key_exists('type', $field) && array_key_exists('name', $field) && $field['type'] == 'structure') {
+            } elseif (option('bnomei.autoid.index.structures') && array_key_exists('type', $field) && array_key_exists('name', $field) && $field['type'] == 'structure') {
                 // make copy as array so can update
                 $f = $field['name'];
                 $structureFieldValue = $page->$f()->value();
@@ -198,7 +201,7 @@ class AutoID
                     $structureObject = $data[$d];
                     // TODO: is support for nested structures needed?
                     if (is_array($structureObject)) {
-                        if(array_key_exists(static::fieldname(), $structureObject)) {
+                        if (array_key_exists(static::fieldname(), $structureObject)) {
                             $value = \Kirby\Toolkit\A::get($structureObject, static::fieldname());
                             if (empty($value)) {
                                 // update structure in copy
@@ -213,7 +216,7 @@ class AutoID
                     }
                 }
 
-                if($hasChange) {
+                if ($hasChange) {
                     $updatePage = array_merge($updatePage, [
                         $field['name'] => \Yaml::encode($copy),
                     ]);
@@ -266,9 +269,10 @@ class AutoID
         return array_merge($commits, $commitsPage, $commitsFiles);
     }
 
-    private static function log(string $msg = '', string $level = 'info', array $context = []):bool {
+    private static function log(string $msg = '', string $level = 'info', array $context = []):bool
+    {
         $log = option('bnomei.autoid.log');
-        if($log && is_callable($log)) {
+        if ($log && is_callable($log)) {
             if (!option('debug') && $level == 'debug') {
                 // skip but...
                 return true;
@@ -288,10 +292,10 @@ class AutoID
         if ($entry = \Kirby\Toolkit\A::get(static::index(), $autoid)) {
             if ($page = \page(\Kirby\Toolkit\A::get($entry, self::ID))) {
                 if ($structureField = \Kirby\Toolkit\A::get($entry, self::STRUCTURE)) {
-                    foreach($page->$structureField()->toStructure() as $structureObject) {
+                    foreach ($page->$structureField()->toStructure() as $structureObject) {
                         $field = static::fieldname();
                         $sf = $structureObject->$field();
-                        if($sf && $sf->value() == $autoid) {
+                        if ($sf && $sf->value() == $autoid) {
                             static::log('found structure', 'debug', ['autoid' => $autoid]);
                             return $structureObject;
                         }
@@ -309,7 +313,8 @@ class AutoID
     }
 
     private static $collection = null;
-    public static function collection() {
+    public static function collection()
+    {
         if (!static::$collection) {
             static::$collection = new \Kirby\Toolkit\Collection(static::index());
         }
@@ -317,20 +322,23 @@ class AutoID
     }
 
     private static $array = null;
-    public static function array() {
+    public static function array()
+    {
         if (!static::$array) {
             static::$array = static::index();
         }
         return static::$array;
     }
 
-    public static function flush() {
+    public static function flush()
+    {
         return static::cache()->flush();
     }
 
-    public static function tinyurl($autoid) {
+    public static function tinyurl($autoid)
+    {
         $url = option('bnomei.autoid.tinyurl.url');
-        if($url && is_callable($url)) {
+        if ($url && is_callable($url)) {
             $url = $url();
         }
         if ($url == kirby()->url('index')) {
@@ -394,16 +402,15 @@ class AutoID
         $generator = kirby()->option('bnomei.autoid.generator');
         if ($generator && is_callable($generator)) {
             $hash = $generator($seed);
-        }
-        else {
+        } else {
             $hash = static::defaultGenerator();
         }
         // if custom generator is not unique enough give it a few tries
         $break = intval(option('bnomei.autoid.generator.break'));
-        while($break > 0 && \Kirby\Toolkit\A::get(static::index(), $hash) != null) {
+        while ($break > 0 && \Kirby\Toolkit\A::get(static::index(), $hash) != null) {
             $hash = static::generator($seed);
             $break--;
-            if($break == 0) {
+            if ($break == 0) {
                 static::log('generator.break hit. fallback to defaultGenerator.', 'warning', ['break' => intval(option('bnomei.autoid.generator.break'))]);
                 $hash = static::defaultGenerator();
             }
