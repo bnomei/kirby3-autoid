@@ -90,6 +90,12 @@ Kirby::plugin('bnomei/autoid', [
             }
             \Bnomei\AutoID::addPage($newPage);
         },
+        'page.duplicate:after' => function ($newPage) {
+            if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
+                return;
+            }
+            \Bnomei\AutoID::resetPage($newPage);
+        },
         'page.changeSlug:after' => function ($newPage, $oldPage) {
             if (!(option('bnomei.autoid.index.pages') && option('bnomei.autoid.index.structures'))) {
                 return;
