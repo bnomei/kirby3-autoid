@@ -166,7 +166,7 @@ class AutoID
         return false;
     }
 
-    private static function indexPage(\Kirby\Cms\Page $page, array $commits = []): array
+    private static function indexPage(\Kirby\Cms\Page $page, array $commits = [], bool $reset = false): array
     {
         static::log('indexPage:before', 'debug', ['page.id' => $page->id()]);
         // kirby()->impersonate('kirby');
@@ -181,7 +181,7 @@ class AutoID
             if (option('bnomei.autoid.index.pages') && array_key_exists('name', $field) && $field['name'] == static::fieldname()) {
                 $f = $field['name'];
                 $autoidField = $page->$f();
-                if ($autoidField->isEmpty()) {
+                if ($autoidField->isEmpty() || $reset) {
                     $autoid = static::generator();
                     $updatePage = array_merge($updatePage, [
                         static::fieldname() => $autoid
@@ -203,7 +203,7 @@ class AutoID
                     if (is_array($structureObject)) {
                         if (array_key_exists(static::fieldname(), $structureObject)) {
                             $value = \Kirby\Toolkit\A::get($structureObject, static::fieldname());
-                            if (empty($value)) {
+                            if (empty($value) || $reset) {
                                 // update structure in copy
                                 $hasChange = true;
                                 $autoid = static::generator();
@@ -233,7 +233,7 @@ class AutoID
                     if (array_key_exists('name', $field) && $field['name'] == static::fieldname()) {
                         $f = self::fieldname();
                         $autoidField = $file->$f();
-                        if ($autoidField->isEmpty()) {
+                        if ($autoidField->isEmpty() || $reset) {
                             $autoid = static::generator();
                             $updateFile = [
                                 static::fieldname() => $autoid
@@ -435,6 +435,11 @@ class AutoID
             return static::removeEntry($field->value());
         }
         return false;
+    }
+    
+    public static function resetPage(\Kirby\Cms\Page $page): bool
+    {
+        return static::pushEntries(static::indexPage($page, [], true))
     }
 
     public static function addFile(\Kirby\Cms\File $file): bool
