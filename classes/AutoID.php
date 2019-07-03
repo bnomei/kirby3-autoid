@@ -439,7 +439,7 @@ class AutoID
     
     public static function resetPage(\Kirby\Cms\Page $page): bool
     {
-        return static::pushEntries(static::indexPage($page, [], true))
+        return static::pushEntries(static::indexPage($page, [], true));
     }
 
     public static function addFile(\Kirby\Cms\File $file): bool
