@@ -10,11 +10,17 @@
 
 namespace Bnomei;
 
+use Kirby\Cache\Cache;
+use Kirby\Cms\Files;
+use Kirby\Cms\Pages;
+use Kirby\Toolkit\A;
+use function time;
+
 class Modified
 {
     private static $indexname = null;
     private static $cache = null;
-    private static function cache(): \Kirby\Cache\Cache
+    private static function cache(): Cache
     {
         if (!static::$cache) {
             static::$cache = kirby()->cache('bnomei.autoid');
@@ -61,23 +67,23 @@ class Modified
         }
 
         // TODO: recursive
-        $recursive = boolval(\Kirby\Toolkit\A::get($config, 'recursive'));
-        $expire = \time() + intval(\Kirby\Toolkit\A::get($config, 'expire'));
+        $recursive = boolval(A::get($config, 'recursive'));
+        $expire = time() + intval(A::get($config, 'expire'));
 
         // create list if modified timestamp entires
         $timestamps = [];
 
         $arraykeys = [];
-        $autoidArray = \Bnomei\AutoID::array();
-        $fieldname = \Bnomei\AutoID::fieldname();
+        $autoidArray = AutoID::array();
+        $fieldname = AutoID::fieldname();
         foreach ($objects as $obj) {
             $autoid = (string) trim($obj->$fieldname()->value());
-            $a = \Kirby\Toolkit\A::get($autoidArray, $autoid);
+            $a = A::get($autoidArray, $autoid);
             $arraykeys[] = (string) $obj->id();
             if ($a) {
                 $timestamps[] = [
                     self::AUTOID => $autoid,
-                    self::MODIFIED => \Kirby\Toolkit\A::get($a, \Bnomei\AutoID::MODIFIED),
+                    self::MODIFIED => A::get($a, AutoID::MODIFIED),
                 ];
             }
         }
@@ -96,8 +102,8 @@ class Modified
     {
         $mod = '';
         if ($g = static::getGroup($group)) {
-            foreach (\Kirby\Toolkit\A::get($g, self::TIMESTAMPS) as $t) {
-                $mod .= \Kirby\Toolkit\A::get($t, self::MODIFIED);
+            foreach (A::get($g, self::TIMESTAMPS) as $t) {
+                $mod .= A::get($t, self::MODIFIED);
             }
         }
         if (strlen($mod) > 0) {
@@ -109,20 +115,20 @@ class Modified
     public static function findGroup(string $group)
     {
         if ($g = static::getGroup($group)) {
-            $expire = \Kirby\Toolkit\A::get($g, self::EXPIRE);
-            if ($expire <= \time()) {
+            $expire = A::get($g, self::EXPIRE);
+            if ($expire <= time()) {
                 // unset group in cache
                 static::setGroup($group, null);
                 // return group 'needs refresh'
                 return self::GROUP_NEEDS_REFRESH;
             }
-            $autoidArray = \Bnomei\AutoID::array();
-            foreach (\Kirby\Toolkit\A::get($g, self::TIMESTAMPS) as $t) {
-                $autoid = \Kirby\Toolkit\A::get($t, self::AUTOID);
-                $a = \Kirby\Toolkit\A::get($autoidArray, $autoid);
+            $autoidArray = AutoID::array();
+            foreach (A::get($g, self::TIMESTAMPS) as $t) {
+                $autoid = A::get($t, self::AUTOID);
+                $a = A::get($autoidArray, $autoid);
                 if ($a) {
-                    $oldModified = \Kirby\Toolkit\A::get($t, self::MODIFIED);
-                    $newModified = \Kirby\Toolkit\A::get($a, \Bnomei\AutoID::MODIFIED);
+                    $oldModified = A::get($t, self::MODIFIED);
+                    $newModified = A::get($a, AutoID::MODIFIED);
                     // break on any modified entry
                     if ($oldModified != $newModified) {
                         // unset group in cache
@@ -141,7 +147,7 @@ class Modified
             // if not returned by now group is still valid
             $isPageCollection = true;
             $arrayOfObjects = [];
-            foreach (\Kirby\Toolkit\A::get($g, self::OBJECTS) as $obj) {
+            foreach (A::get($g, self::OBJECTS) as $obj) {
                 $object = page($obj);
                 if ($object) { // is a page
                     $arrayOfObjects[] = $object;
@@ -153,9 +159,9 @@ class Modified
                 }
             }
             if ($isPageCollection) {
-                return new \Kirby\Cms\Pages($arrayOfObjects);
+                return new Pages($arrayOfObjects);
             } else {
-                return new \Kirby\Cms\Files($arrayOfObjects);
+                return new Files($arrayOfObjects);
             }
         }
         // if group not found return 'needs refresh'

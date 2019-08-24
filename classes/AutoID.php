@@ -38,6 +38,17 @@
 
 namespace Bnomei;
 
+use Kirby\Cache\Cache;
+use Kirby\Cms\File;
+use Kirby\Cms\Page;
+use Kirby\Toolkit\A;
+use Kirby\Toolkit\Collection;
+use Yaml;
+use function bin2hex;
+use function hexdec;
+use function openssl_random_pseudo_bytes;
+use function page;
+
 class AutoID
 {
     private static $fieldname = 'autoid'; // TODO: custom fieldname is not a good idea imho
@@ -48,7 +59,7 @@ class AutoID
 
     private static $indexname = null;
     private static $cache = null;
-    private static function cache(): \Kirby\Cache\Cache
+    private static function cache(): Cache
     {
         if (!static::$cache) {
             static::$cache = kirby()->cache('bnomei.autoid');
@@ -156,7 +167,7 @@ class AutoID
     private static function removeEntry($autoid): bool
     {
         $index = static::cache()->get(static::$indexname);
-        if ($index && is_array($index) && \Kirby\Toolkit\A::get($index, $autoid)) {
+        if ($index && is_array($index) && A::get($index, $autoid)) {
             static::log('removeEntry', 'debug', ['autoid' => $autoid]);
             unset($index[$autoid]);
             static::$collection = null;
@@ -166,7 +177,7 @@ class AutoID
         return false;
     }
 
-    private static function indexPage(\Kirby\Cms\Page $page, array $commits = [], bool $reset = false): array
+    private static function indexPage(Page $page, array $commits = [], bool $reset = false): array
     {
         static::log('indexPage:before', 'debug', ['page.id' => $page->id()]);
         // kirby()->impersonate('kirby');
@@ -194,7 +205,7 @@ class AutoID
                 // make copy as array so can update
                 $f = $field['name'];
                 $structureFieldValue = $page->$f()->value();
-                $data = \Yaml::decode($structureFieldValue);
+                $data = Yaml::decode($structureFieldValue);
                 $copy = $data; // this is a copy since its an array
                 $hasChange = false;
                 for ($d=0; $d<count($data); $d++) {
@@ -202,7 +213,7 @@ class AutoID
                     // TODO: is support for nested structures needed?
                     if (is_array($structureObject)) {
                         if (array_key_exists(static::fieldname(), $structureObject)) {
-                            $value = \Kirby\Toolkit\A::get($structureObject, static::fieldname());
+                            $value = A::get($structureObject, static::fieldname());
                             if (empty($value) || $reset) {
                                 // update structure in copy
                                 $hasChange = true;
@@ -218,7 +229,7 @@ class AutoID
 
                 if ($hasChange) {
                     $updatePage = array_merge($updatePage, [
-                        $field['name'] => \Yaml::encode($copy),
+                        $field['name'] => Yaml::encode($copy),
                     ]);
                 }
             }
@@ -289,9 +300,9 @@ class AutoID
 
     public static function find($autoid)
     {
-        if ($entry = \Kirby\Toolkit\A::get(static::index(), $autoid)) {
-            if ($page = \page(\Kirby\Toolkit\A::get($entry, self::ID))) {
-                if ($structureField = \Kirby\Toolkit\A::get($entry, self::STRUCTURE)) {
+        if ($entry = A::get(static::index(), $autoid)) {
+            if ($page = page(A::get($entry, self::ID))) {
+                if ($structureField = A::get($entry, self::STRUCTURE)) {
                     foreach ($page->$structureField()->toStructure() as $structureObject) {
                         $field = static::fieldname();
                         $sf = $structureObject->$field();
@@ -300,7 +311,7 @@ class AutoID
                             return $structureObject;
                         }
                     }
-                } elseif ($filename = \Kirby\Toolkit\A::get($entry, self::FILENAME)) {
+                } elseif ($filename = A::get($entry, self::FILENAME)) {
                     static::log('found file', 'debug', ['autoid' => $autoid]);
                     return $page->file($filename);
                 }
@@ -316,7 +327,7 @@ class AutoID
     public static function collection()
     {
         if (!static::$collection) {
-            static::$collection = new \Kirby\Toolkit\Collection(static::index());
+            static::$collection = new Collection(static::index());
         }
         return static::$collection;
     }
@@ -363,7 +374,7 @@ class AutoID
         $bits = (int) $log + 1; // length in bits
         $filter = (int) (1 << $bits) - 1; // set all lower bits to 1
         do {
-            $rnd = \hexdec(\bin2hex(\openssl_random_pseudo_bytes($bytes)));
+            $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
             $rnd = $rnd & $filter; // discard irrelevant bits
         } while ($rnd > $range);
         return $min + $rnd;
@@ -407,7 +418,7 @@ class AutoID
         }
         // if custom generator is not unique enough give it a few tries
         $break = intval(option('bnomei.autoid.generator.break'));
-        while ($break > 0 && \Kirby\Toolkit\A::get(static::index(), $hash) != null) {
+        while ($break > 0 && A::get(static::index(), $hash) != null) {
             $hash = static::generator($seed);
             $break--;
             if ($break == 0) {
@@ -422,12 +433,12 @@ class AutoID
      * PUBLIC add/remove
      */
 
-    public static function addPage(\Kirby\Cms\Page $page): bool
+    public static function addPage(Page $page): bool
     {
         return static::pushEntries(static::indexPage($page));
     }
 
-    public static function removePage(\Kirby\Cms\Page $page): bool
+    public static function removePage(Page $page): bool
     {
         $f = static::fieldname();
         $field = $page->$f();
@@ -436,13 +447,13 @@ class AutoID
         }
         return false;
     }
-    
-    public static function resetPage(\Kirby\Cms\Page $page): bool
+
+    public static function resetPage(Page $page): bool
     {
         return static::pushEntries(static::indexPage($page, [], true));
     }
 
-    public static function addFile(\Kirby\Cms\File $file): bool
+    public static function addFile(File $file): bool
     {
         $p = $file->page();
         if (!$p) { // https://github.com/bnomei/kirby3-autoid/pull/21
@@ -451,7 +462,7 @@ class AutoID
         return static::pushEntries(static::indexPage($p));
     }
 
-    public static function removeFile(\Kirby\Cms\File $file): bool
+    public static function removeFile(File $file): bool
     {
         $f = static::fieldname();
         $field = $file->$f();
