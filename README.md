@@ -1,6 +1,7 @@
 # Kirby 3 AutoID
 
-![Downloads](https://img.shields.io/github/downloads/bnomei/kirby3-autoid/total.svg) ![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-autoid.svg) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3-black.svg) ![Kirby 3 Pluginkit](https://img.shields.io/badge/Pluginkit-YES-cca000.svg) [![Build Status](https://travis-ci.com/bnomei/kirby3-autoid.svg?branch=master)](https://travis-ci.com/bnomei/kirby3-autoid) [![Coverage Status](https://coveralls.io/repos/github/bnomei/kirby3-autoid/badge.svg?branch=master)](https://coveralls.io/github/bnomei/kirby3-autoid?branch=master) [![Gitter](https://badges.gitter.im/bnomei-kirby-3-plugins/community.svg)](https://gitter.im/bnomei-kirby-3-plugins/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+![Release](https://img.shields.io/github/release/bnomei/kirby3-autoid.svg?color=ae81ff&style=flat-square) ![Repo Size](https://img.shields.io/github/repo-size/bnomei/kirby3-autoid.svg?color=272822&style=flat-square) ![License](https://img.shields.io/github/license/mashape/apistatus.svg?color=272822&style=flat-square) ![Issues](https://img.shields.io/github/issues/bnomei/kirby3-autoid?color=e6db74&style=flat-square) [![Build Status](https://img.shields.io/travis/bnomei/kirby3-autoid?style=flat-square)](https://travis-ci.com/bnomei/kirby3-autoid)  [![Coverage Status](https://img.shields.io/coveralls/github/bnomei/kirby3-autoid?style=flat-square)](https://coveralls.io/github/bnomei/kirby3-autoid) [![Demo](https://img.shields.io/website/https/kirby3-plugins.bnomei.com/autoid.svg?down_color=%23666&down_message=none&up_color=%23f92672&up_message=Examples&style=flat-square)](https://kirby3-plugins.bnomei.com/autoid) [![Gitter](https://img.shields.io/gitter/room/bnomei-kirby-3-plugins/community?color=982ab3&style=flat-square)](https://gitter.im/bnomei-kirby-3-plugins/community) [![Twitter](https://img.shields.io/badge/Twitter-Bnomei-66d9ef.svg?style=flat-square)](https://twitter.com/bnomei)
+
 
 Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections and Tiny-URL.
 
@@ -227,45 +228,41 @@ You can use the provided blueprints and snippets to get you started with this pl
 
 ## Settings
 
-**generator**
+#### generator
 - default: alphanumeric hash value generator (~2.8 trillion possibilites)
 
-**generator.break**
+#### generator.break
 - default: try `42` times to generate and verify uniqueness of hash
 
-**index.pages**
+#### index.pages
 - default: `true`
 
-**index.structures**
+#### index.structures
 - default: `true`
 
-**index.files**
+#### index.files
 - default: `true`
 
-**index**
+#### index
 - default: `kirby()->site()->pages()->index()` in callback
 
-**tinyurl.url**
+#### tinyurl.url
 - default: callback returning `site()->url()`
 - example: `https://bno.mei`
 
 > TIP: use htaccess on that domain to redirect `RewriteRule (.*) http://devkit.bnomei.com/x/$1 [R=301]`
 
-**tinyurl.folder**
+#### tinyurl.folder
 - default: `x` Tinyurl format: yourdomain/{folder}/{hash}
 
-**log.enabled**
+#### log.enabled
 - default: `false`
 
-**log**
+#### log
 - default: callback to `kirbyLog()`
 
-**modified[recursive]**
-- default: `false`
-
-**modified[expire]**
+#### modified[expire]
 - default: `30` seconds
-
 
 ## Disclaimer
 
@@ -279,7 +276,8 @@ It is discouraged to use this plugin in any project that promotes racism, sexism
 
 ## Credits
 
-based on K2 versions of
+inspired by the following Kirby 2 Plugins:
+
 - https://github.com/texnixe/kirby-structure-id
 - https://github.com/helllicht/kirby-autoid
 - K2 core tinyurl implementation
