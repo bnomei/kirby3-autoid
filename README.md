@@ -1,13 +1,22 @@
 # Kirby 3 AutoID
 
-![Release](https://img.shields.io/github/release/bnomei/kirby3-autoid.svg?color=ae81ff&style=flat-square) ![Repo Size](https://img.shields.io/github/repo-size/bnomei/kirby3-autoid.svg?color=272822&style=flat-square) ![Issues](https://img.shields.io/github/issues/bnomei/kirby3-autoid?color=e6db74&style=flat-square) [![Build Status](https://img.shields.io/travis/bnomei/kirby3-autoid?style=flat-square)](https://travis-ci.com/bnomei/kirby3-autoid)  [![Coverage Status](https://img.shields.io/coveralls/github/bnomei/kirby3-autoid?style=flat-square)](https://coveralls.io/github/bnomei/kirby3-autoid) [![Demo](https://img.shields.io/website/https/kirby3-plugins.bnomei.com/autoid.svg?down_color=%23666&down_message=none&up_color=%23f92672&up_message=Examples&style=flat-square)](https://kirby3-plugins.bnomei.com/autoid) [![Gitter](https://img.shields.io/gitter/room/bnomei-kirby-3-plugins/community?color=982ab3&style=flat-square)](https://gitter.im/bnomei-kirby-3-plugins/community) [![Twitter](https://img.shields.io/badge/Twitter-Bnomei-66d9ef.svg?style=flat-square)](https://twitter.com/bnomei)
+![Release](https://img.shields.io/github/release/bnomei/kirby3-autoid.svg?color=ae81ff&style=flat-square) ![Repo Size](https://img.shields.io/github/repo-size/bnomei/kirby3-autoid.svg?color=272822&style=flat-square) ![Issues](https://img.shields.io/github/issues/bnomei/kirby3-autoid?color=e6db74&style=flat-square) [![Build Status](https://img.shields.io/travis/bnomei/kirby3-autoid?style=flat-square)](https://travis-ci.com/bnomei/kirby3-autoid)  [![Coverage Status](https://img.shields.io/coveralls/github/bnomei/kirby3-autoid?style=flat-square)](https://coveralls.io/github/bnomei/kirby3-autoid) [![Demo](https://img.shields.io/website/https/kirby3-plugins.bnomei.com/autoid.svg?down_color=%23666&down_message=none&up_color=%23f92672&up_message=Examples&style=flat-square)](https://kirby3-plugins.bnomei.com/autoid) [![Gitter](https://img.shields.io/gitter/room/bnomei-kirby-3-plugins/community?color=982ab3&style=flat-square)](https://gitter.im/bnomei-kirby-3-plugins/community) [![Twitter](https://img.shields.io/badge/twitter-bnomei-66d9ef.svg?style=flat-square)](https://twitter.com/bnomei)
 
 
 Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections and Tiny-URL.
 
+1. [Why AutoID](https://github.com/bnomei/kirby3-autoid#why-autoid)
+2. [Setup](https://github.com/bnomei/kirby3-autoid#setup)
+3. [Usage autoid()](https://github.com/bnomei/kirby3-autoid#usage-autoid)
+4. [Why modified()](https://github.com/bnomei/kirby3-autoid#why-modified)
+5. [Usage modified()](https://github.com/bnomei/kirby3-autoid#usage-modified)
+6. [Usage modifiedHash()](https://github.com/bnomei/kirby3-autoid#usage-modifiedhash)
+7. [Tiny-URL](https://github.com/bnomei/kirby3-autoid#tiny-url)
+8. [Settings](https://github.com/bnomei/kirby3-autoid#settings)
+
 ## Commercial Usage
 
-This plugin is free (MIT License) but if you use it in a commercial project please consider to
+This plugin is free (MIT license) but if you use it in a commercial project please consider to
 - [make a donation 🍻](https://www.paypal.me/bnomei/10) or
 - [buy me ☕☕](https://buymeacoff.ee/bnomei) or
 - [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
@@ -217,52 +226,21 @@ echo $page->autoid()->value(); // 8j5g64hh
 echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 ```
 
-## How to test
-
-> WARNING: Test before you use it in production. 
-
-You can use the provided blueprints and snippets to get you started with this plugin and maybe even contribute an issue. They are not registered by the plugin but just part of the documentation.
-
-- [blueprints](https://github.com/bnomei/kirby3-autoid/tree/master/blueprints)
-- [snippets](https://github.com/bnomei/kirby3-autoid/tree/master/snippets)
-
 ## Settings
 
-#### generator
-- default: alphanumeric hash value generator (~2.8 trillion possibilites)
-
-#### generator.break
-- default: try `42` times to generate and verify uniqueness of hash
-
-#### index.pages
-- default: `true`
-
-#### index.structures
-- default: `true`
-
-#### index.files
-- default: `true`
-
-#### index
-- default: `kirby()->site()->pages()->index()` in callback
-
-#### tinyurl.url
-- default: callback returning `site()->url()`
-- example: `https://bno.mei`
-
-> TIP: use htaccess on that domain to redirect `RewriteRule (.*) http://devkit.bnomei.com/x/$1 [R=301]`
-
-#### tinyurl.folder
-- default: `x` Tinyurl format: yourdomain/{folder}/{hash}
-
-#### log.enabled
-- default: `false`
-
-#### log
-- default: callback to `kirbyLog()`
-
-#### modified[expire]
-- default: `30` seconds
+| bnomei.autoid.            | Default        | Description               |            
+|---------------------------|----------------|---------------------------|
+| generator | | alphanumeric hash value generator (~2.8 trillion possibilites) |
+| generator.break | `42 | try n-times to generate and verify uniqueness of hash |
+| index.pages | `true` | |
+| index.structures | `true` | |
+| index.files | `true` | |
+| index | callback returning `kirby()->site()->pages()->index()` | |
+| tinyurl.url | callback returning `site()->url()` | example: `https://bno.mei`. Use htaccess on that domain to redirect `RewriteRule (.*) http://devkit.bnomei.com/x/$1 [R=301]` |
+| tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
+| log.enabled | `false` | |
+| log | callback with `kirbyLog()` | |
+| modified => expire | `30` seconds | |
 
 ## Disclaimer
 
