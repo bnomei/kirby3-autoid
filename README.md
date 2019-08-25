@@ -231,16 +231,16 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 | bnomei.autoid.            | Default        | Description               |            
 |---------------------------|----------------|---------------------------|
 | generator | | alphanumeric hash value generator (~2.8 trillion possibilites) |
-| generator.break | `42 | try n-times to generate and verify uniqueness of hash |
+| generator.break | `42` | try n-times to generate and verify uniqueness of hash |
 | index.pages | `true` | |
 | index.structures | `true` | |
 | index.files | `true` | |
-| index | callback returning `kirby()->site()->pages()->index()` | |
-| tinyurl.url | callback returning `site()->url()` | example: `https://bno.mei`. Use htaccess on that domain to redirect `RewriteRule (.*) http://devkit.bnomei.com/x/$1 [R=301]` |
+| index | callback | returning `kirby()->site()->pages()->index()` |
+| tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
 | tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
 | log.enabled | `false` | |
-| log | callback with `kirbyLog()` | |
-| modified => expire | `30` seconds | |
+| log | callback | with `kirbyLog()` |
+| modified => expire | `30` | in seconds |
 
 ## Disclaimer
 
