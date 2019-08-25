@@ -230,7 +230,7 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 
 | bnomei.autoid.            | Default        | Description               |            
 |---------------------------|----------------|---------------------------|
-| generator | | alphanumeric hash value generator (~2.8 trillion possibilites) |
+| generator | callback | alphanumeric hash value generator (~2.8 trillion possibilites) |
 | generator.break | `42` | try n-times to generate and verify uniqueness of hash |
 | index.pages | `true` | |
 | index.structures | `true` | |
