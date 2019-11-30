@@ -1,0 +1,5 @@
+Autoid: ipyhet1i
+
+----
+
+Template: autoidimage

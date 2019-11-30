@@ -1,8 +1,8 @@
 {
   "name": "bnomei/kirby3-autoid",
   "type": "kirby-plugin",
-  "version": "1.4.2",
-  "description": "Automatic unique ID for Pages, StructureObjects and Files including performant helpers to retrieve them. Bonus: Cache for collections and Tiny-URL.",
+  "version": "2.0.0",
+  "description": "Automatic unique ID for Pages and Files including performant helpers to retrieve them. Bonus: Tiny-URL.",
   "license": "MIT",
   "authors": [
     {
@@ -15,11 +15,15 @@
     "kirby3-cms",
     "kirby3-plugin",
     "autoid",
-    "collection",
+    "pages",
+    "files",
+    "incremental",
+    "random",
+    "uuid",
+    "token",
+    "lookup",
     "cache",
-    "reference",
-    "persistent",
-    "structure-id",
+    "performance",
     "tiny-url"
   ],
   "autoload": {
@@ -33,7 +37,8 @@
   },
   "require": {
     "php": ">=7.2.0",
-    "getkirby/composer-installer": "^1.1"
+    "getkirby/composer-installer": "^1.1",
+    "ramsey/uuid": "^3.8"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.3",
@@ -52,6 +57,12 @@
     "dist": [
       "composer install --no-dev --optimize-autoloader",
       "git rm -rf --cached .; git add .;"
+    ],
+    "kirby": [
+      "composer install",
+      "composer update",
+      "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
+      "composer update --working-dir=tests/kirby"
     ]
   },
   "extra": {
