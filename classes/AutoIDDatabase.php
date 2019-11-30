@@ -77,6 +77,16 @@ final class AutoIDDatabase
         return $this->find($autoid) !== null;
     }
 
+    public function modified($autoid): ?int
+    {
+        if (is_a($autoid, Field::class)) {
+            $autoid = (string) $autoid->value();
+        }
+
+        $find = $this->find($autoid);
+        return $find ? $find->modified() : null;
+    }
+
     public function insertOrUpdate(AutoIDItem $item)
     {
         // remove all with same page AND file props (even if empty)

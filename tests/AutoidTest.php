@@ -87,6 +87,18 @@ final class AutoidTest extends TestCase
         );
     }
 
+    public function testModified()
+    {
+        AutoID::flush();
+        AutoID::index();
+
+        $page = $this->randomPage();
+
+        $this->assertEquals(
+            $page->modified(), modified($page->autoid()->value())
+        );
+    }
+
     public function testFindByID()
     {
         AutoID::index(true);

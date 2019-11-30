@@ -71,6 +71,13 @@ final class AutoIDItemTest extends TestCase
         );
     }
 
+    public function testId()
+    {
+        $this->assertEquals(
+            $this->file->file()->id(), $this->file->id()
+        );
+    }
+
     public function test__get()
     {
         $this->assertInstanceOf(

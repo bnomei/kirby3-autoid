@@ -30,7 +30,7 @@ final class AutoIDItem
 
     public function modified(): int
     {
-        return $this->data->modified;
+        return intval($this->data->modified);
     }
 
     public function page(): ?Page

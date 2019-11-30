@@ -17,6 +17,7 @@ Automatic unique ID for Pages and Files including performant helpers to retrieve
 1. [Why AutoID](https://github.com/bnomei/kirby3-autoid#why-autoid)
 1. [Setup](https://github.com/bnomei/kirby3-autoid#setup)
 1. [Usage autoid()](https://github.com/bnomei/kirby3-autoid#usage-autoid)
+1. [Usage modified()](https://github.com/bnomei/kirby3-autoid#usage-modified)
 1. [Tiny-URL](https://github.com/bnomei/kirby3-autoid#tiny-url)
 1. [Settings](https://github.com/bnomei/kirby3-autoid#settings)
 
@@ -144,6 +145,15 @@ $autoidOfFile = autoid($file);
 ```
 
 > ATTENTION: This only works in version 2 of this plugin.
+
+
+## Usage modified()
+
+The `modified()` helper lets you retrieve the modified timestamp from the AutoID database without requiring the file to be checked on disk.
+
+```php
+$modified = modified($autoid); // null or int
+```
 
 ## Tiny-URL
 

@@ -42,6 +42,11 @@ final class AutoID
         return rtrim($url, '/') . '/' . $autoid;
     }
 
+    public static function modified($autoid)
+    {
+        return AutoIDDatabase::singleton()->modified($autoid);
+    }
+
     public static function index(bool $force = false)
     {
         if (AutoIDDatabase::singleton()->count() === 0 || $force) {
