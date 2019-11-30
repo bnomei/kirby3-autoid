@@ -122,6 +122,23 @@ if(is_a($result, 'Kirby\Cms\Page')) {
 }
 ```
 
+**Create a Page/File programmatically and retrieve autoid**
+
+Right after creating a Page/File programmatically the `$object->autoid()->value()` will be empty since the `page.create:after`/`file.create:after` hook triggered and `update` hook but the Page/File-Object returned by `createChild()`/`createFile()` can not reflect this yet. But you can use the `autoid()` helper to retrieve the autoid from the database based on the `id` of your Page/File-Object. 
+
+```php
+$page = $parent->createChild($yourProps);
+$autoid = autoid($page->id());
+// or
+$autoid = autoid($page);
+
+$file = $page->createFile($yourFileProps);
+$autoidOfFile = autoid($file->id());
+// or
+$autoidOfFile = autoid($file);
+```
+
+> ATTENTION: This only works in version 2 of this plugin.
 
 ## Tiny-URL
 

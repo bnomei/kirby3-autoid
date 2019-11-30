@@ -16,10 +16,14 @@ if (!function_exists('autoid')) {
             return \Bnomei\AutoID::find($obj);
         } elseif (is_a($obj, 'Kirby\Cms\Page') ||
             is_a($obj, 'Kirby\Cms\File')) {
-            \Bnomei\AutoID::push($obj);
-            return \Bnomei\AutoID::find(
-                $obj->${\Bnomei\AutoID::FIELDNAME}()
+            $find = \Bnomei\AutoID::find(
+                $obj->{\Bnomei\AutoID::FIELDNAME}()
             );
+            if (!$find) {
+                \Bnomei\AutoID::push($obj);
+                $find = \Bnomei\AutoID::findByID($obj->id());
+            }
+            return $find;
         }
         return null;
     }

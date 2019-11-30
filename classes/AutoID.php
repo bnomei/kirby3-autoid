@@ -17,6 +17,16 @@ final class AutoID
     {
         // self::index(); // NOTE: would cause loop
         $find = AutoIDDatabase::singleton()->find($autoid);
+        if (!$find) {
+            $find = AutoIDDatabase::singleton()->findByID($autoid);
+        }
+        return $find ? $find->toObject() : null;
+    }
+
+    public static function findByID($objectid)
+    {
+        // self::index(); // NOTE: would cause loop
+        $find = AutoIDDatabase::singleton()->findByID($objectid);
         return $find ? $find->toObject() : null;
     }
 
@@ -109,7 +119,7 @@ final class AutoID
             while ($break > 0 && $unique === false) {
                 $break--;
                 $newid = $generator();
-                if (AutoID::find($autoid) === null) {
+                if (AutoID::find($newid) === null) {
                     $unique = true;
                     $autoid = $newid;
                 }
@@ -154,7 +164,7 @@ final class AutoID
     {
         $cache = kirby()->cache('bnomei.autoid');
         if (is_a($cache, FileCache::class)) {
-            return A::get($cache->options(), 'root') . '/' .A::get($cache->options(), 'prefix');
+            return A::get($cache->options(), 'root') . '/' . A::get($cache->options(), 'prefix');
         }
         // @codeCoverageIgnoreStart
         return kirby()->roots()->cache();

@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bnomei\AutoID;
+use Kirby\Cms\File;
 use Kirby\Cms\Page;
 use Kirby\Toolkit\Str;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +12,11 @@ final class AutoidTest extends TestCase
 {
     private $depth;
     private $filepath;
+
+    public function setUp(): void
+    {
+        AutoID::index(true);
+    }
 
     public function setUpPages(): void
     {
@@ -57,6 +63,11 @@ final class AutoidTest extends TestCase
         return site()->pages()->index()->notTemplate('home')->shuffle()->first();
     }
 
+    public function randomFile(): ?File
+    {
+        return site()->pages()->index()->notTemplate('home')->files()->shuffle()->first();
+    }
+
     public function tearDownPages(): void
     {
         kirby()->impersonate('kirby');
@@ -73,6 +84,35 @@ final class AutoidTest extends TestCase
         AutoID::index();
         $this->assertTrue(
             \Bnomei\AutoIDDatabase::singleton()->count() > 0
+        );
+    }
+
+    public function testFindByID()
+    {
+        AutoID::index(true);
+
+        /* @var $page \Kirby\Cms\Page */
+        $page = $this->randomPage();
+        $this->assertTrue(
+            AutoID::findByID($page->id()) === $page
+        );
+        $this->assertTrue(
+            \autoid($page->id()) === $page
+        );
+        $this->assertTrue(
+            \autoid($page) === $page
+        );
+
+        /* @var $page \Kirby\Cms\File */
+        $file = $this->randomFile();
+        $this->assertTrue(
+            AutoID::findByID($file->id()) === $file
+        );
+        $this->assertTrue(
+            \autoid($file->id()) === $file
+        );
+        $this->assertTrue(
+            \autoid($file) === $file
         );
     }
 

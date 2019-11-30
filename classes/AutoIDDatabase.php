@@ -54,6 +54,29 @@ final class AutoIDDatabase
         return null;
     }
 
+    public function findByID($objectid): ?AutoIDItem
+    {
+        if (is_a($objectid, Field::class)) {
+            $objectid = (string) $objectid->value();
+        }
+
+        $page = '';
+        $filename = '';
+        if (pathinfo($objectid, PATHINFO_EXTENSION)) {
+            $pathinfo = pathinfo($objectid);
+            $page = $pathinfo['dirname'];
+            $filename = $pathinfo['basename'];
+        } else {
+            $pathinfo = pathinfo($objectid);
+            $page = $pathinfo['dirname'] === '.' ? $pathinfo['basename'] : $pathinfo['dirname'] . '/' . $pathinfo['basename'];
+        }
+
+        foreach ($this->db->query("SELECT * FROM AUTOID WHERE page = '$page' AND filename = '$filename'") as $obj) {
+            return new AutoIDItem($obj);
+        }
+        return null;
+    }
+
     public function exists($autoid): bool
     {
         if (is_a($autoid, Field::class)) {
@@ -66,7 +89,6 @@ final class AutoIDDatabase
     public function insertOrUpdate(AutoIDItem $item)
     {
         $autoid = $item->autoid();
-
 
         if ($this->find($autoid)) {
             $this->db->query("
