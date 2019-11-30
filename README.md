@@ -106,7 +106,7 @@ special:
     value: "{{ page.autoid }}"
 ```
 
-**Find single Object in PHP**
+**Find Page/File-Object in PHP**
 
 ```php
 $autoid = 'any-autoid-value';
@@ -124,11 +124,12 @@ if(is_a($result, 'Kirby\Cms\Page')) {
 
 **Create a Page/File programmatically and retrieve autoid**
 
-Right after creating a Page/File programmatically the `$object->autoid()->value()` will be empty since the `page.create:after`/`file.create:after` hook triggered and `update` hook but the Page/File-Object returned by `createChild()`/`createFile()` can not reflect this yet. But you can use the `autoid()` helper to retrieve the autoid from the database based on the `id` of your Page/File-Object. 
+Right after creating a Page/File programmatically the `$object->autoid()->value()` will be empty since the `page.create:after`/`file.create:after` hook triggered an `update`-hook but the Page/File-Object returned by `createChild()`/`createFile()` can not reflect this yet. But you can use the `autoid()` helper to retrieve the autoid from the database based on the `id` of your Page/File-Object. 
 
 ```php
 $page = $parent->createChild($yourProps);
-$willBeEmpty = $page->autoid()->value();
+// return page.create:after but not [=> autoid => $page->update(...)] 
+$willBeEmpty = $page->autoid()->value(); 
 // but
 $autoid = autoid($page->id());
 // or

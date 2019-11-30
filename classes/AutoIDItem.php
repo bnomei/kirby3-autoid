@@ -67,6 +67,11 @@ final class AutoIDItem
         return null;
     }
 
+    public function id()
+    {
+        return $this->page . ($this->filename ? '/' . $this->filename : '');
+    }
+
     public function get()
     {
         return $this->toObject();

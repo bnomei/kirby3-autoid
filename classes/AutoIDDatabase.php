@@ -60,16 +60,7 @@ final class AutoIDDatabase
             $objectid = (string) $objectid->value();
         }
 
-        $page = '';
-        $filename = '';
-        if (pathinfo($objectid, PATHINFO_EXTENSION)) {
-            $pathinfo = pathinfo($objectid);
-            $page = $pathinfo['dirname'];
-            $filename = $pathinfo['basename'];
-        } else {
-            $pathinfo = pathinfo($objectid);
-            $page = $pathinfo['dirname'] === '.' ? $pathinfo['basename'] : $pathinfo['dirname'] . '/' . $pathinfo['basename'];
-        }
+        list($page, $filename) = $this->pageFilenameFromPath($objectid);
 
         foreach ($this->db->query("SELECT * FROM AUTOID WHERE page = '$page' AND filename = '$filename'") as $obj) {
             return new AutoIDItem($obj);
@@ -88,25 +79,17 @@ final class AutoIDDatabase
 
     public function insertOrUpdate(AutoIDItem $item)
     {
-        $autoid = $item->autoid();
+        // remove all with same page AND file props (even if empty)
+        $this->deleteByID($item->id());
 
-        if ($this->find($autoid)) {
-            $this->db->query("
-                UPDATE AUTOID
-                SET
-                page = '{$item->page}'
-                filename = '{$item->filename}'
-                kind = '{$item->kind}'
-                WHERE autoid = '$autoid'
-            ");
-        } else {
-            $this->db->query("
-                INSERT INTO AUTOID
-                (autoid, modified, page, filename, kind)
-                VALUES
-                ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->kind}')
-            ");
-        }
+        // enter a new single entry
+        $this->db->query("
+            INSERT INTO AUTOID
+            (autoid, modified, page, filename, kind)
+            VALUES
+            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->kind}')
+        ");
+
     }
 
     public function delete($autoid)
@@ -124,9 +107,35 @@ final class AutoIDDatabase
         $this->db->query("DELETE FROM AUTOID WHERE autoid = '$autoid'");
     }
 
+    public function deleteByID($objectid)
+    {
+        if (is_a($objectid, Field::class)) {
+            $objectid = (string)$objectid->value();
+        }
+
+        list($page, $filename) = $this->pageFilenameFromPath($objectid);
+
+        $this->db->query("DELETE FROM AUTOID WHERE page = '$page' AND filename = '$filename'");
+    }
+
     public function flush()
     {
         $this->db->query("DELETE FROM AUTOID WHERE autoid != ''");
+    }
+
+    private function pageFilenameFromPath(string $objectid)
+    {
+        $page = '';
+        $filename = '';
+        if (pathinfo($objectid, PATHINFO_EXTENSION)) {
+            $pathinfo = pathinfo($objectid);
+            $page = $pathinfo['dirname'];
+            $filename = $pathinfo['basename'];
+        } else {
+            $pathinfo = pathinfo($objectid);
+            $page = $pathinfo['dirname'] === '.' ? $pathinfo['basename'] : $pathinfo['dirname'] . '/' . $pathinfo['basename'];
+        }
+        return [$page, $filename];
     }
 
     private static $singleton;
