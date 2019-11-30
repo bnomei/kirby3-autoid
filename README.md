@@ -128,11 +128,15 @@ Right after creating a Page/File programmatically the `$object->autoid()->value(
 
 ```php
 $page = $parent->createChild($yourProps);
+$willBeEmpty = $page->autoid()->value();
+// but
 $autoid = autoid($page->id());
 // or
 $autoid = autoid($page);
 
 $file = $page->createFile($yourFileProps);
+$willBeEmpty = $file->autoid()->value();
+// but
 $autoidOfFile = autoid($file->id());
 // or
 $autoidOfFile = autoid($file);
