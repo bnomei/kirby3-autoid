@@ -164,8 +164,6 @@ Kirby will retrieve the modified timestamp for all files in a collection in read
 $modified = modified(site()->pages()->index()); // null or int
 ```
 
-> TIP: using the array
-
 ## Tiny-URL
 
 ```php
