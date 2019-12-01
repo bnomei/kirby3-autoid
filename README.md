@@ -156,6 +156,10 @@ The `modified()` helper lets you retrieve the modified timestamp from the AutoID
 $modified = modified($autoid); // null or int
 // array of strings
 $modified = modified([$autoid1, $autoid2, $autoid3]); // null or int
+```
+
+Kirby will retrieve the modified timestamp for all files in a collection in reading them from the disk, but the `modified()` helper is still a nice way to get the max value easily. 
+```php
 // collection object
 $modified = modified(site()->pages()->index()); // null or int
 ```
