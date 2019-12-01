@@ -79,12 +79,27 @@ final class AutoIDDatabase
 
     public function modified($autoid): ?int
     {
+        if(is_array($autoid)) {
+            return $this->modifiedByArray($autoid);
+        }
+
         if (is_a($autoid, Field::class)) {
             $autoid = (string) $autoid->value();
         }
 
         $find = $this->find($autoid);
         return $find ? $find->modified() : null;
+    }
+
+    public function modifiedByArray(array $autoids): ?int
+    {
+        $list = implode(', ', array_map(function($autoid) {
+            return "'$autoid'";
+        }, $autoids));
+        foreach ($this->db->query("SELECT MAX(modified) as maxmod FROM AUTOID WHERE autoid IN ($list)") as $obj) {
+            return intval($obj->maxmod);
+        }
+        return null;
     }
 
     public function insertOrUpdate(AutoIDItem $item)

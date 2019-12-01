@@ -97,6 +97,28 @@ final class AutoidTest extends TestCase
         $this->assertEquals(
             $page->modified(), modified($page->autoid()->value())
         );
+
+        $pageA = $this->randomPage();
+        $pageB = $this->randomPage();
+        $this->assertEquals(
+            max($pageA->modified(), $pageB->modified()),
+            modified([
+                $pageA->autoid()->value(),
+                $pageB->autoid()->value()
+            ])
+        );
+
+        $allCollection = site()->pages()->index()->notTemplate('home');
+        $maxModified = null;
+        foreach($allCollection as $pall) {
+            if (!$maxModified || $maxModified < $pall->modified()) {
+                $maxModified = $pall->modified();
+            }
+        }
+        $this->assertEquals(
+            $maxModified,
+            modified($allCollection)
+        );
     }
 
     public function testFindByID()

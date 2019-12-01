@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Bnomei;
 
 use Kirby\Cache\FileCache;
+use Kirby\Cms\Field;
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
 use Kirby\Toolkit\A;
+use Kirby\Toolkit\Iterator;
 
 final class AutoID
 {
@@ -44,7 +46,34 @@ final class AutoID
 
     public static function modified($autoid)
     {
-        return AutoIDDatabase::singleton()->modified($autoid);
+        if (is_string($autoid) || is_a($autoid, Field::class)) {
+            return AutoIDDatabase::singleton()->modified($autoid);
+        }
+
+        if (is_array($autoid)) {
+            return AutoIDDatabase::singleton()->modifiedByArray($autoid);
+        }
+
+        if (is_a($autoid, Page::class) || is_a($autoid, File::class)) {
+            if ($autoid->{AutoID::FIELDNAME}()->isNotEmpty()) {
+                return self::modified($autoid->{AutoID::FIELDNAME}());
+            } else {
+                return $autoid->modified();
+            }
+        }
+
+        if ($autoid instanceof Iterator) {
+            $maxModified = [];
+            foreach($autoid as $obj) {
+                $mod = self::modified($obj);
+                if ($mod) {
+                    $maxModified[] = $mod;
+                }
+            }
+            return count($maxModified) > 0 ? max($maxModified) : null;
+        }
+
+        return null;
     }
 
     public static function index(bool $force = false)

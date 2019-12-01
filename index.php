@@ -31,12 +31,7 @@ if (!function_exists('autoid')) {
     function modified($autoid): ?int
     {
         \Bnomei\AutoID::index();
-
-        if (is_string($autoid) ||
-            is_a($autoid, 'Kirby\Cms\Field')) {
-            return \Bnomei\AutoID::modified($autoid);
-        }
-        return null;
+        return \Bnomei\AutoID::modified($autoid);
     }
 }
 

@@ -149,11 +149,18 @@ $autoidOfFile = autoid($file);
 
 ## Usage modified()
 
-The `modified()` helper lets you retrieve the modified timestamp from the AutoID database without requiring the file to be checked on disk.
+The `modified()` helper lets you retrieve the modified timestamp from the AutoID database without requiring the file to be checked on disk. It even works for Collections of Pages/Files that have Objects with and without an `autoid`.
 
 ```php
+// string
 $modified = modified($autoid); // null or int
+// array of strings
+$modified = modified([$autoid1, $autoid2, $autoid3]); // null or int
+// collection object
+$modified = modified(site()->pages()->index()); // null or int
 ```
+
+> TIP: using the array
 
 ## Tiny-URL
 
