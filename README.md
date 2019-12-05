@@ -19,7 +19,9 @@ Automatic unique ID for Pages and Files including performant helpers to retrieve
 1. [Usage autoid()](https://github.com/bnomei/kirby3-autoid#usage-autoid)
 1. [Usage modified()](https://github.com/bnomei/kirby3-autoid#usage-modified)
 1. [Tiny-URL](https://github.com/bnomei/kirby3-autoid#tiny-url)
+1. [Structures](https://github.com/bnomei/kirby3-autoid#structures)
 1. [Settings](https://github.com/bnomei/kirby3-autoid#settings)
+1. [Changelog](https://github.com/bnomei/kirby3-autoid#changelog)
 
 ## Commercial Usage
 
@@ -174,6 +176,10 @@ echo $page->autoid()->value(); // 8j5g64hh
 echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 ```
 
+## Structures
+
+There is no support for Structures in v2 (yet) only back in [v1.4.1](https://github.com/bnomei/kirby3-autoid/releases/tag/v1.4.1). Please take the [poll and provide some details](https://forum.getkirby.com/t/poll-structure-support-in-v2-of-autoid-plugin/16556) why you need them.
+
 ## Settings
 
 | bnomei.autoid.            | Default        | Description               |            
@@ -183,8 +189,9 @@ echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 | tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
 | tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
 
-## What's new in Version 2
+## Changelog
 
+### 2.0.0
 - New ID-Generators have been added: *Incrementing*, *UUID* and *Token* (default)
 - Support for StructureObject has been removed after much consideration of use-cases and solutions. This reduces the code complexity of this plugin and avoids common pitfalls on your end when using StructureObjects instead of Pages. The Blocks of the new [Editor](https://github.com/getkirby/editor) are a good alternative.
 - The *Collection Cache* has been removed since the current version of [Lapse plugin](https://github.com/bnomei/kirby3-lapse#objects) provides a cleaner solution.
