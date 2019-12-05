@@ -15,7 +15,7 @@ final class IncrementingGenerator implements AutoIDGenerator
         $this->seed = abs(intval($seed));
     }
 
-    public function generate()
+    public function generate(): string
     {
         $id = $this->seed;
         $file = self::file();
@@ -31,7 +31,7 @@ final class IncrementingGenerator implements AutoIDGenerator
         }
         // @codeCoverageIgnoreEnd
 
-        return $id;
+        return strval($id);
     }
 
     private static $file;

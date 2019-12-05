@@ -8,5 +8,5 @@ interface AutoIDGenerator
 {
     public function __construct($seed);
 
-    public function generate();
+    public function generate(): string;
 }

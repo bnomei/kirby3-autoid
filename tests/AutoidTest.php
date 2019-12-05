@@ -148,6 +148,11 @@ final class AutoidTest extends TestCase
         $this->assertTrue(
             \autoid($file) === $file
         );
+
+        $unusedID = \autoid();
+        $this->assertTrue(
+             AutoID::find($unusedID) === null
+        );
     }
 
     public function testTinyUrl()

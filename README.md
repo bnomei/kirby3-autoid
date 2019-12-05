@@ -81,6 +81,13 @@ return [
 ];
 ```
 
+**Get a new AutoID value not in use yet**
+```php
+$autoid = \Bnomei\AutoID::generate(); // null | string
+// or
+$autoid = autoid();
+```
+
 ## Usage autoid()
 
 **Store a single reference to a File from another Page**

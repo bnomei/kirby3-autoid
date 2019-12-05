@@ -145,24 +145,29 @@ final class AutoID
         } elseif (!$force && $object->{self::FIELDNAME}()->isNotEmpty()) {
             return $object->{self::FIELDNAME}()->value();
         }
-        $autoid = null;
-        $generator = option('bnomei.autoid.generator');
-        if (is_callable($generator)) {
-            $break = intval(option('bnomei.autoid.generator.break'));
-            $unique = false;
-            while ($break > 0 && $unique === false) {
-                $break--;
-                $newid = $generator();
-                if (AutoID::find($newid) === null) {
-                    $unique = true;
-                    $autoid = $newid;
-                }
-            }
+        $autoid = self::generate();
+        if ($autoid) {
             $object->update([
                 self::FIELDNAME => $autoid
             ]);
         }
         return $autoid;
+    }
+
+    public static function generate(): ?string
+    {
+        $generator = option('bnomei.autoid.generator');
+        if (is_callable($generator)) {
+            $break = intval(option('bnomei.autoid.generator.break'));
+            while ($break > 0) {
+                $break--;
+                $newid = $generator();
+                if (AutoID::find($newid) === null) {
+                    return $newid;
+                }
+            }
+        }
+        return null;
     }
 
     public static function remove($object)

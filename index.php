@@ -11,9 +11,13 @@ if (!function_exists('autoid')) {
     {
         \Bnomei\AutoID::index();
 
-        if (is_string($obj) ||
+        if ($obj === null) {
+            return \Bnomei\AutoID::generate();
+
+        } else if (is_string($obj) ||
             is_a($obj, 'Kirby\Cms\Field')) {
             return \Bnomei\AutoID::find($obj);
+
         } elseif (is_a($obj, 'Kirby\Cms\Page') ||
             is_a($obj, 'Kirby\Cms\File')) {
             $find = \Bnomei\AutoID::find(
