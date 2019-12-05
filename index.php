@@ -7,11 +7,11 @@ if (!class_exists('Bnomei\AutoID')) {
 }
 
 if (!function_exists('autoid')) {
-    function autoid($obj = null)
+    function autoid($obj = \Bnomei\AutoID::GENERATE)
     {
         \Bnomei\AutoID::index();
 
-        if ($obj === null) {
+        if ($obj === \Bnomei\AutoID::GENERATE) {
             return \Bnomei\AutoID::generate();
 
         } else if (is_string($obj) ||

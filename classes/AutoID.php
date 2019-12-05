@@ -14,6 +14,7 @@ use Kirby\Toolkit\Iterator;
 final class AutoID
 {
     public const FIELDNAME = 'autoid';
+    public const GENERATE = 'PleaseGenerateUnusedAutoID'; // not like any random id
 
     public static function find($autoid)
     {
