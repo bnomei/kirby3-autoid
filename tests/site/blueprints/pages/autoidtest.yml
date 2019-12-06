@@ -19,3 +19,19 @@ sections:
         size: large
       autoid:
         type: autoid
+      level1:
+        type: structure
+        translate: false
+        fields:
+          text:
+            type: text
+          autoid:
+            type: hidden
+          level2:
+            type: structure
+            translate: false
+            fields:
+              text:
+                type: text
+              autoid:
+                type: hidden

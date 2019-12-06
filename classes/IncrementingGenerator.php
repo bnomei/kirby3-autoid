@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Exception;
 use Kirby\Toolkit\F;
 
 final class IncrementingGenerator implements AutoIDGenerator
@@ -27,7 +28,7 @@ final class IncrementingGenerator implements AutoIDGenerator
         $id = $id + 1;
         // @codeCoverageIgnoreStart
         if (F::write($file, $id) === false) {
-            throw new \Exception('The file "' . $file . '" is not writable');
+            throw new Exception('The file "' . $file . '" is not writable');
         }
         // @codeCoverageIgnoreEnd
 

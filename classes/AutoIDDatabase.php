@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Kirby\Cache\FileCache;
 use Kirby\Cms\Field;
 use Kirby\Database\Database;
 use Kirby\Database\Db;
+use Kirby\Toolkit\A;
 use Kirby\Toolkit\F;
 
 final class AutoIDDatabase
@@ -17,8 +19,8 @@ final class AutoIDDatabase
     public function __construct(array $options = [])
     {
         $this->options = array_merge([
-            'template' => realpath(__DIR__ . '/../') . '/autoid.sqlite',
-            'target' => AutoID::cacheFolder() . '/autoid.sqlite',
+            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-1-0.sqlite',
+            'target' => self::cacheFolder() . '/autoid-v2-1-0.sqlite',
         ], $options);
 
         $target = $this->options['target'];
@@ -60,9 +62,9 @@ final class AutoIDDatabase
             $objectid = (string) $objectid->value();
         }
 
-        list($page, $filename) = $this->pageFilenameFromPath($objectid);
+        list($page, $filename, $structure) = $this->pageFilenameFromPath($objectid);
 
-        foreach ($this->db->query("SELECT * FROM AUTOID WHERE page = '$page' AND filename = '$filename'") as $obj) {
+        foreach ($this->db->query("SELECT * FROM AUTOID WHERE page = '$page' AND filename = '$filename' AND structure = '$structure'") as $obj) {
             return new AutoIDItem($obj);
         }
         return null;
@@ -79,7 +81,7 @@ final class AutoIDDatabase
 
     public function modified($autoid): ?int
     {
-        if(is_array($autoid)) {
+        if (is_array($autoid)) {
             return $this->modifiedByArray($autoid);
         }
 
@@ -93,7 +95,7 @@ final class AutoIDDatabase
 
     public function modifiedByArray(array $autoids): ?int
     {
-        $list = implode(', ', array_map(function($autoid) {
+        $list = implode(', ', array_map(function ($autoid) {
             return "'$autoid'";
         }, $autoids));
         foreach ($this->db->query("SELECT MAX(modified) as maxmod FROM AUTOID WHERE autoid IN ($list)") as $obj) {
@@ -104,17 +106,20 @@ final class AutoIDDatabase
 
     public function insertOrUpdate(AutoIDItem $item)
     {
+        if (!$item) {
+            return;
+        }
+
         // remove all with same page AND file props (even if empty)
         $this->deleteByID($item->id());
 
         // enter a new single entry
         $this->db->query("
             INSERT INTO AUTOID
-            (autoid, modified, page, filename, kind)
+            (autoid, modified, page, filename, structure, kind)
             VALUES
-            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->kind}')
+            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}')
         ");
-
     }
 
     public function delete($autoid)
@@ -138,9 +143,14 @@ final class AutoIDDatabase
             $objectid = (string)$objectid->value();
         }
 
-        list($page, $filename) = $this->pageFilenameFromPath($objectid);
+        list($page, $filename, $structure) = $this->pageFilenameFromPath($objectid);
 
-        $this->db->query("DELETE FROM AUTOID WHERE page = '$page' AND filename = '$filename'");
+        if (strlen($structure) > 0) {
+            // remove structure by autoid since path to object is not unique
+            $this->delete($structure);
+        } else {
+            $this->db->query("DELETE FROM AUTOID WHERE page = '$page' AND filename = '$filename'");
+        }
     }
 
     public function flush()
@@ -152,6 +162,7 @@ final class AutoIDDatabase
     {
         $page = '';
         $filename = '';
+        $structure = '';
         if (pathinfo($objectid, PATHINFO_EXTENSION)) {
             $pathinfo = pathinfo($objectid);
             $page = $pathinfo['dirname'];
@@ -159,8 +170,9 @@ final class AutoIDDatabase
         } else {
             $pathinfo = pathinfo($objectid);
             $page = $pathinfo['dirname'] === '.' ? $pathinfo['basename'] : $pathinfo['dirname'] . '/' . $pathinfo['basename'];
+            $structure = strpos($page, '#') !== false ? explode('#', $page)[1] : '';
         }
-        return [$page, $filename];
+        return [$page, $filename, $structure];
     }
 
     private static $singleton;
@@ -172,5 +184,16 @@ final class AutoIDDatabase
         }
         self::$singleton = new self($options);
         return self::$singleton;
+    }
+
+    public static function cacheFolder(): string
+    {
+        $cache = kirby()->cache('bnomei.autoid');
+        if (is_a($cache, FileCache::class)) {
+            return A::get($cache->options(), 'root') . '/' . A::get($cache->options(), 'prefix');
+        }
+        // @codeCoverageIgnoreStart
+        return kirby()->roots()->cache();
+        // @codeCoverageIgnoreEnd
     }
 }

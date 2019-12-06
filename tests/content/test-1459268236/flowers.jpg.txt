@@ -1,0 +1,5 @@
+Autoid: dcr4fcsi
+
+----
+
+Template: autoidimage

@@ -12,14 +12,13 @@
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
 
-Automatic unique ID for Pages and Files including performant helpers to retrieve them. Bonus: Tiny-URL.
+Automatic unique ID for Pages, Files and nested Structures including performant helpers to retrieve them. Bonus: Tiny-URL.
 
 1. [Why AutoID](https://github.com/bnomei/kirby3-autoid#why-autoid)
 1. [Setup](https://github.com/bnomei/kirby3-autoid#setup)
 1. [Usage autoid()](https://github.com/bnomei/kirby3-autoid#usage-autoid)
 1. [Usage modified()](https://github.com/bnomei/kirby3-autoid#usage-modified)
 1. [Tiny-URL](https://github.com/bnomei/kirby3-autoid#tiny-url)
-1. [Structures](https://github.com/bnomei/kirby3-autoid#structures)
 1. [Settings](https://github.com/bnomei/kirby3-autoid#settings)
 1. [Changelog](https://github.com/bnomei/kirby3-autoid#changelog)
 
@@ -64,6 +63,25 @@ Add a Field named `autoid` with type `hidden` to your blueprints. Also set `tran
 ```
 
 > This Plugin has an optional Field called `autoid` which is a non-translatable and disabled Text-Field. Use it with `type: autoid`.
+
+**Structures**
+
+To keep the AutoID value unique you must make the structure non-translatable.
+
+```yaml
+ content:
+  type: fields
+  fields:
+    mystructure:
+      type: structure
+      translate: false      # <-------     
+      fields:
+        text:
+          type: textarea
+        autoid:             # <-------
+          type: hidden
+          translate: false 
+```
 
 ### Generator
 You can set a different Generator or define your own using the `bnomei.autoid.generator` option.
@@ -114,6 +132,34 @@ special:
     fetch: page.children.filterBy("template", "special")
     text: "{{ page.title }}"
     value: "{{ page.autoid }}"
+```
+
+**Store multiple references to StructureObjects from a different Field from another Page**
+
+**Page 'a'**
+```yaml
+categories:
+  label: Define Categories
+  type: structure
+  translate: false
+  fields:
+    title:
+      type: text
+    autoid:
+      type: hidden
+      translate: false
+```
+
+**Page 'b'**
+```yaml
+category:
+  label: Select Categories
+  type: checkboxes
+  options: query
+  query:
+    fetch: page('a').categories.toStructure
+    text: "{{ structureItem.title }}"
+    value: "{{ structureItem.autoid }}"
 ```
 
 **Find Page/File-Object in PHP**
@@ -181,10 +227,6 @@ echo $page->autoid()->value(); // 8j5g64hh
 echo $page->tinyurl(); // https://devkit.bnomei.com/x/8j5g64hh
 ```
 
-## Structures
-
-There is no support for Structures in v2 (yet) only back in [v1.4.1](https://github.com/bnomei/kirby3-autoid/releases/tag/v1.4.1). Please take the [poll and provide some details](https://forum.getkirby.com/t/poll-structure-support-in-v2-of-autoid-plugin/16556) why you need them.
-
 ## Settings
 
 | bnomei.autoid.            | Default        | Description               |            
@@ -193,13 +235,6 @@ There is no support for Structures in v2 (yet) only back in [v1.4.1](https://git
 | generator.break | `42` | try max n-times to generate and verify uniqueness of hash |
 | tinyurl.url | callback | returning `site()->url()`. Use htaccess on that domain to redirect `RewriteRule (.*) http://www.bnomei.com/x/$1 [R=301]` |
 | tinyurl.folder | `x` | Tinyurl format: yourdomain/{folder}/{hash} |
-
-## Changelog
-
-### 2.0.0
-- New ID-Generators have been added: *Incrementing*, *UUID* and *Token* (default)
-- Support for StructureObject has been removed after much consideration of use-cases and solutions. This reduces the code complexity of this plugin and avoids common pitfalls on your end when using StructureObjects instead of Pages. The Blocks of the new [Editor](https://github.com/getkirby/editor) are a good alternative.
-- The *Collection Cache* has been removed since the current version of [Lapse plugin](https://github.com/bnomei/kirby3-lapse#objects) provides a cleaner solution.
 
 ## Disclaimer
 

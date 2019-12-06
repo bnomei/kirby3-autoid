@@ -1,5 +1,0 @@
-Autoid: 3a2basab
-
-----
-
-Template: autoidimage

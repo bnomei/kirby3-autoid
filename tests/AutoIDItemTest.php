@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bnomei\AutoIDItem;
+use Kirby\Cms\Page;
 use PHPUnit\Framework\TestCase;
 
 final class AutoIDItemTest extends TestCase
@@ -51,7 +52,7 @@ final class AutoIDItemTest extends TestCase
     public function testPage()
     {
         $this->assertInstanceOf(
-            \Kirby\Cms\Page::class,
+            Page::class,
             $this->page->page()
         );
     }
@@ -74,14 +75,15 @@ final class AutoIDItemTest extends TestCase
     public function testId()
     {
         $this->assertEquals(
-            $this->file->file()->id(), $this->file->id()
+            $this->file->file()->id(),
+            $this->file->id()
         );
     }
 
     public function test__get()
     {
         $this->assertInstanceOf(
-            \Kirby\Cms\Page::class,
+            Page::class,
             $this->page->page()
         );
     }
@@ -111,7 +113,7 @@ final class AutoIDItemTest extends TestCase
     public function testToObject()
     {
         $this->assertInstanceOf(
-            \Kirby\Cms\Page::class,
+            Page::class,
             $this->page->toObject()
         );
         $this->assertInstanceOf(

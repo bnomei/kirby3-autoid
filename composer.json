@@ -1,8 +1,8 @@
 {
   "name": "bnomei/kirby3-autoid",
   "type": "kirby-plugin",
-  "version": "2.0.7",
-  "description": "Automatic unique ID for Pages and Files including performant helpers to retrieve them. Bonus: Tiny-URL.",
+  "version": "2.1.0",
+  "description": "Automatic unique ID for Pages, Files and nested Structures including performant helpers to retrieve them. Bonus: Tiny-URL.",
   "license": "MIT",
   "authors": [
     {
@@ -24,7 +24,9 @@
     "lookup",
     "cache",
     "performance",
-    "tiny-url"
+    "tiny-url",
+    "structures",
+    "nested"
   ],
   "autoload": {
     "psr-4": {

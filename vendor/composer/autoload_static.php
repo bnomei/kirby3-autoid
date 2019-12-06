@@ -54,6 +54,7 @@ class ComposerStaticInit83b66f1b65ca96351d4364f6887d6372
         'Bnomei\\AutoIDDatabase' => __DIR__ . '/../..' . '/classes/AutoIDDatabase.php',
         'Bnomei\\AutoIDGenerator' => __DIR__ . '/../..' . '/classes/AutoIDGenerator.php',
         'Bnomei\\AutoIDItem' => __DIR__ . '/../..' . '/classes/AutoIDItem.php',
+        'Bnomei\\AutoIDProcess' => __DIR__ . '/../..' . '/classes/AutoIDProcess.php',
         'Bnomei\\IncrementingGenerator' => __DIR__ . '/../..' . '/classes/IncrementingGenerator.php',
         'Bnomei\\TokenGenerator' => __DIR__ . '/../..' . '/classes/TokenGenerator.php',
         'Bnomei\\UUIDGenerator' => __DIR__ . '/../..' . '/classes/UUIDGenerator.php',

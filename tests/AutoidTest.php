@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bnomei\AutoID;
+use Bnomei\AutoIDDatabase;
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
 use Kirby\Toolkit\Str;
@@ -15,7 +16,7 @@ final class AutoidTest extends TestCase
 
     public function setUp(): void
     {
-        AutoID::index(true);
+        // AutoID::index(true);
     }
 
     public function setUpPages(): void
@@ -36,14 +37,31 @@ final class AutoidTest extends TestCase
     public function createPage($parent, int $idx, int $depth = 3)
     {
         $id = 'Test ' . abs(crc32(microtime() . $idx . $depth));
-        /* @var $page \Kirby\Cms\Page */
+        /* @var $page Page */
         kirby()->impersonate('kirby');
         $page = $parent->createChild([
             'slug' => Str::slug($id),
             'template' => 'autoidtest',
             'content' => [
-                'title' => $id
-            ]
+                'title' => $id,
+                'level1' => Yaml::encode([
+                    [
+                        'text' => 'level1 0 ' . $id,
+                        'level2' => [
+                            ['text' => 'level1 0 level2 0 ' . $id],
+                            ['text' => 'level1 0 level2 1 ' . $id]
+                        ],
+                    ],
+                    [
+                        'text' => 'level1 1 ' . $id,
+                        'level2' => [
+                            ['text' => 'level1 1 level2 0 ' . $id],
+                            ['text' => 'level1 1 level2 1 ' . $id],
+                            ['text' => 'level1 1 level2 2 ' . $id],
+                        ],
+                    ],
+                ]),
+            ],
         ]);
         $page->createFile([
             'source' => $this->filepath,
@@ -71,19 +89,32 @@ final class AutoidTest extends TestCase
     public function tearDownPages(): void
     {
         kirby()->impersonate('kirby');
-        /* @var $page \Kirby\Cms\Page */
+        /* @var $page Page */
         foreach (site()->pages()->index()->notTemplate('home') as $page) {
             $page->delete(true);
         }
         AutoID::flush();
     }
 
+    public function testFlush()
+    {
+        AutoID::flush();
+
+        $this->assertTrue(
+            AutoIDDatabase::singleton()->count() === 0
+        );
+    }
+
     public function testIndex()
     {
         AutoID::flush();
-        AutoID::index();
+        $count = AutoID::index();
+
         $this->assertTrue(
-            \Bnomei\AutoIDDatabase::singleton()->count() > 0
+            $count > 0
+        );
+        $this->assertTrue(
+            AutoIDDatabase::singleton()->count() > 0
         );
     }
 
@@ -95,7 +126,8 @@ final class AutoidTest extends TestCase
         $page = $this->randomPage();
 
         $this->assertEquals(
-            $page->modified(), modified($page->autoid()->value())
+            $page->modified(),
+            modified($page->autoid()->value())
         );
 
         $pageA = $this->randomPage();
@@ -110,7 +142,7 @@ final class AutoidTest extends TestCase
 
         $allCollection = site()->pages()->index()->notTemplate('home');
         $maxModified = null;
-        foreach($allCollection as $pall) {
+        foreach ($allCollection as $pall) {
             if (!$maxModified || $maxModified < $pall->modified()) {
                 $maxModified = $pall->modified();
             }
@@ -125,7 +157,7 @@ final class AutoidTest extends TestCase
     {
         AutoID::index(true);
 
-        /* @var $page \Kirby\Cms\Page */
+        /* @var $page Page */
         $page = $this->randomPage();
         $this->assertTrue(
             AutoID::findByID($page->id()) === $page
@@ -137,7 +169,7 @@ final class AutoidTest extends TestCase
             \autoid($page) === $page
         );
 
-        /* @var $page \Kirby\Cms\File */
+        /* @var $page File */
         $file = $this->randomFile();
         $this->assertTrue(
             AutoID::findByID($file->id()) === $file
@@ -151,13 +183,13 @@ final class AutoidTest extends TestCase
 
         $unusedID = \autoid();
         $this->assertTrue(
-             AutoID::find($unusedID) === null
+            AutoID::find($unusedID) === null
         );
     }
 
     public function testTinyUrl()
     {
-        /* @var $page \Kirby\Cms\Page */
+        /* @var $page Page */
         $page = $this->randomPage();
         $this->assertStringEndsWith(
             '/x/' . $page->{AutoID::FIELDNAME}()->value(),
@@ -168,7 +200,7 @@ final class AutoidTest extends TestCase
     public function testDB()
     {
         $this->assertNotNull(
-            \Bnomei\AutoIDDatabase::singleton()->database()
+            AutoIDDatabase::singleton()->database()
         );
 
         $pageA = $this->randomPage();
@@ -179,27 +211,27 @@ final class AutoidTest extends TestCase
         );
 
         $autoidAField = $pageA->autoid();
-        $pageC = \Bnomei\AutoIDDatabase::singleton()->find($autoidAField)->page();
+        $pageC = AutoIDDatabase::singleton()->find($autoidAField)->page();
         $this->assertEquals(
             $pageA,
             $pageC
         );
 
         $this->assertTrue(
-            \Bnomei\AutoIDDatabase::singleton()->exists($autoidAField)
+            AutoIDDatabase::singleton()->exists($autoidAField)
         );
 
-        $autoidAItem = \Bnomei\AutoIDDatabase::singleton()->find($autoidAField);
-        \Bnomei\AutoIDDatabase::singleton()->delete($autoidAItem);
+        $autoidAItem = AutoIDDatabase::singleton()->find($autoidAField);
+        AutoIDDatabase::singleton()->delete($autoidAItem);
 
         $this->assertFalse(
-            \Bnomei\AutoIDDatabase::singleton()->exists($autoidAField)
+            AutoIDDatabase::singleton()->exists($autoidAField)
         );
 
         $pageDField = $this->randomPage()->autoid();
-        \Bnomei\AutoIDDatabase::singleton()->delete($pageDField);
+        AutoIDDatabase::singleton()->delete($pageDField);
 
-        \Bnomei\AutoIDDatabase::singleton()->delete(null);
+        AutoIDDatabase::singleton()->delete(null);
     }
 
     public function testDuplicate()
@@ -210,7 +242,7 @@ final class AutoidTest extends TestCase
         $dup = $page->duplicate('test-duplicate');
         // will trigger duplicate:after hook
         // but call again for testing
-        AutoID::unlinkTheCopy($dup);
+        AutoID::push($dup, true);
 
         $this->assertTrue(
             $dup->autoid()->isNotEmpty()
