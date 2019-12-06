@@ -130,7 +130,6 @@ final class AutoIDProcess
 
         try {
             kirby()->impersonate('kirby');
-            //var_dump($this->update);
             $this->object->update($this->update);
         } catch (Exception $ex) {
             $this->revert();
