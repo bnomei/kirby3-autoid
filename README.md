@@ -93,6 +93,7 @@ return [
         // override with custom callback if needed
         return (new \Bnomei\TokenGenerator())->generate();
         // return (new \Bnomei\IncrementingGenerator(0))->generate();
+        // return (new \Bnomei\NanoGenerator())->generate();
         // return (new \Bnomei\UUIDGenerator(site()->url()))->generate();
     },
     // ... other options

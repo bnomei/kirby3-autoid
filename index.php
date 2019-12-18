@@ -43,7 +43,8 @@ Kirby::plugin('bnomei/autoid', [
         'generator' => function (string $seed = null) {
             // override with custom callback if needed
             return (new \Bnomei\TokenGenerator($seed))->generate();
-        // return (new \Bnomei\IncrementingGenerator(0))->generate();
+            // return (new \Bnomei\IncrementingGenerator(0))->generate();
+            // return (new \Bnomei\NanoGenerator())->generate();
             // return (new \Bnomei\UUIDGenerator(site()->url()))->generate();
         },
         'generator.break' => 42, // generator loops for uniqueness

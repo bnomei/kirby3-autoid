@@ -32,3 +32,4 @@
 /vendor/getkirby/composer-installer
 /vendor/zordius/lightncandy/build
 coverage.xml
+/vendor/hidehalo/nanoid-php/benchmark/*

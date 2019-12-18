@@ -24,6 +24,10 @@ class ComposerStaticInit83b66f1b65ca96351d4364f6887d6372
         array (
             'Kirby\\' => 6,
         ),
+        'H' => 
+        array (
+            'Hidehalo\\Nanoid\\' => 16,
+        ),
         'B' => 
         array (
             'Bnomei\\' => 7,
@@ -43,6 +47,10 @@ class ComposerStaticInit83b66f1b65ca96351d4364f6887d6372
         array (
             0 => __DIR__ . '/..' . '/getkirby/composer-installer/src',
         ),
+        'Hidehalo\\Nanoid\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hidehalo/nanoid-php/src',
+        ),
         'Bnomei\\' => 
         array (
             0 => __DIR__ . '/../..' . '/classes',
@@ -56,8 +64,14 @@ class ComposerStaticInit83b66f1b65ca96351d4364f6887d6372
         'Bnomei\\AutoIDItem' => __DIR__ . '/../..' . '/classes/AutoIDItem.php',
         'Bnomei\\AutoIDProcess' => __DIR__ . '/../..' . '/classes/AutoIDProcess.php',
         'Bnomei\\IncrementingGenerator' => __DIR__ . '/../..' . '/classes/IncrementingGenerator.php',
+        'Bnomei\\NanoGenerator' => __DIR__ . '/../..' . '/classes/NanoGenerator.php',
         'Bnomei\\TokenGenerator' => __DIR__ . '/../..' . '/classes/TokenGenerator.php',
         'Bnomei\\UUIDGenerator' => __DIR__ . '/../..' . '/classes/UUIDGenerator.php',
+        'Hidehalo\\Nanoid\\Client' => __DIR__ . '/..' . '/hidehalo/nanoid-php/src/Client.php',
+        'Hidehalo\\Nanoid\\Core' => __DIR__ . '/..' . '/hidehalo/nanoid-php/src/Core.php',
+        'Hidehalo\\Nanoid\\CoreInterface' => __DIR__ . '/..' . '/hidehalo/nanoid-php/src/CoreInterface.php',
+        'Hidehalo\\Nanoid\\Generator' => __DIR__ . '/..' . '/hidehalo/nanoid-php/src/Generator.php',
+        'Hidehalo\\Nanoid\\GeneratorInterface' => __DIR__ . '/..' . '/hidehalo/nanoid-php/src/GeneratorInterface.php',
         'Kirby\\ComposerInstaller\\CmsInstaller' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/CmsInstaller.php',
         'Kirby\\ComposerInstaller\\Installer' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/Installer.php',
         'Kirby\\ComposerInstaller\\Plugin' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/Plugin.php',
