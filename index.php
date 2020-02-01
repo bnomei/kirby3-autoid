@@ -2,26 +2,28 @@
 
 @include_once __DIR__ . '/vendor/autoload.php';
 
-if (!class_exists('Bnomei\AutoID')) {
+if (! class_exists('Bnomei\AutoID')) {
     require_once __DIR__ . '/classes/AutoID.php';
 }
 
-if (!function_exists('autoid')) {
+if (! function_exists('autoid')) {
     function autoid($obj = \Bnomei\AutoID::GENERATE)
     {
         \Bnomei\AutoID::index();
 
         if ($obj === \Bnomei\AutoID::GENERATE) {
             return \Bnomei\AutoID::generate();
-        } elseif (is_string($obj) ||
+        }
+        if (is_string($obj) ||
             is_a($obj, 'Kirby\Cms\Field')) {
             return \Bnomei\AutoID::find($obj);
-        } elseif (is_a($obj, 'Kirby\Cms\Page') ||
+        }
+        if (is_a($obj, 'Kirby\Cms\Page') ||
             is_a($obj, 'Kirby\Cms\File')) {
             $find = \Bnomei\AutoID::find(
                 $obj->{\Bnomei\AutoID::FIELDNAME}()
             );
-            if (!$find) {
+            if (! $find) {
                 \Bnomei\AutoID::push($obj);
                 $find = \Bnomei\AutoID::findByID($obj->id());
             }
@@ -40,7 +42,7 @@ if (!function_exists('autoid')) {
 Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
-        'generator' => function (string $seed = null) {
+        'generator' => function (?string $seed = null) {
             // override with custom callback if needed
             return (new \Bnomei\TokenGenerator($seed))->generate();
             // return (new \Bnomei\IncrementingGenerator(0))->generate();
@@ -102,9 +104,8 @@ Kirby::plugin('bnomei/autoid', [
                     $page = autoid($autoid);
                     if ($page) {
                         return \go($page->url(), 302);
-                    } else {
-                        return \go(site()->errorPage()->url(), 404);
                     }
+                    return \go(site()->errorPage()->url(), 404);
                 },
             ],
         ];

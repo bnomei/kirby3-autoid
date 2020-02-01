@@ -1,0 +1,12 @@
+parameters:
+  level: max
+  fileExtensions:
+    - php
+  autoload_directories:
+    - classes
+  paths:
+    - classes
+  checkMissingIterableValueType: false
+  inferPrivatePropertyTypeFromConstructor: true
+  checkGenericClassInNonGenericObjectType: false
+

@@ -44,7 +44,7 @@ final class AutoIDProcess
         return $this->indexed;
     }
 
-    private function indexPageOrFile()
+    private function indexPageOrFile(): void
     {
         $autoid = null;
 
@@ -54,7 +54,7 @@ final class AutoIDProcess
 
         if ($this->overwrite || $this->object->{AutoID::FIELDNAME}()->isEmpty()) {
             $autoid = AutoID::generate();
-            if (!$autoid) {
+            if (! $autoid) {
                 return;
             }
             if ($this->object->blueprint()->field(AutoID::FIELDNAME)) {
@@ -69,7 +69,7 @@ final class AutoIDProcess
         );
     }
 
-    private function indexStructures()
+    private function indexStructures(): void
     {
         $data = [];
         foreach ($this->object->blueprint()->fields() as $field) {
@@ -77,7 +77,7 @@ final class AutoIDProcess
                 continue;
             }
             $fieldname = A::get($field, 'name');
-            if (!$fieldname) {
+            if (! $fieldname) {
                 continue;
             }
             $field = $this->object->{$fieldname}();
@@ -88,7 +88,7 @@ final class AutoIDProcess
                 $yaml = Yaml::decode($field->value());
                 $yaml = $this->indexArray($yaml, [$fieldname]);
                 $data[$fieldname] = Yaml::encode($yaml);
-            } catch (Exception $e) {
+            } catch (Exception $exception) {
             }
         }
         $this->update = array_merge($this->update, $data);
@@ -100,7 +100,7 @@ final class AutoIDProcess
         foreach ($data as $key => $value) {
             if ($key === AutoID::FIELDNAME) {
                 $autoid = $value;
-                if ($this->overwrite || !$value || $value === 'null') {
+                if ($this->overwrite || ! $value || $value === 'null') {
                     $autoid = AutoID::generate();
                     if ($autoid) {
                         $copy[$key] = $autoid;
@@ -121,9 +121,9 @@ final class AutoIDProcess
         return $copy;
     }
 
-    private function update()
+    private function update(): void
     {
-        if (!$this->hasChanges) {
+        if (! $this->hasChanges) {
             $this->indexed = true;
             return;
         }
@@ -131,14 +131,14 @@ final class AutoIDProcess
         try {
             kirby()->impersonate('kirby');
             $this->object->update($this->update);
-        } catch (Exception $ex) {
+        } catch (Exception $exception) {
             $this->revert();
         } finally {
             $this->indexed = true;
         }
     }
 
-    private function revert()
+    private function revert(): void
     {
         foreach ($this->autoids as $autoid) {
             AutoIDDatabase::singleton()->delete($autoid);

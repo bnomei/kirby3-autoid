@@ -6,7 +6,6 @@ namespace Bnomei;
 
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
-use Kirby\Cms\StructureObject;
 use Kirby\Toolkit\Obj;
 
 final class AutoIDItem
@@ -15,6 +14,7 @@ final class AutoIDItem
     public const KIND_FILE = 'File';
     public const KIND_STRUCTUREOBJECT = 'StructureObject';
 
+    /** @var Obj */
     private $data;
 
     public function __construct($data)
@@ -49,10 +49,10 @@ final class AutoIDItem
         return null;
     }
 
-    public function structureObject()
+    public function structureObject(): array
     {
-        $tree = array_map(function ($v) {
-            return is_numeric($v) ? intval($v) : $v;
+        $tree = array_map(static function ($value) {
+            return is_numeric($value) ? intval($value) : $value;
         }, explode(',', $this->structure));
 
         return $tree;
@@ -61,8 +61,7 @@ final class AutoIDItem
 //        $tree = explode(',', $this->structure);
 //        $root = array_shift($tree);
 //        $field = $this->page()->{$root}();
-
-
+//
 //        foreach ($tree as $leaf) {
 //            if ($field->isNotEmpty()) {
 //                foreach ($field->toStructure() as $obj) {
@@ -95,13 +94,18 @@ final class AutoIDItem
         return $this->data->kind === self::KIND_STRUCTUREOBJECT;
     }
 
+    /**
+     * @return array|File|Page|null
+     */
     public function toObject()
     {
         if ($this->isPage()) {
             return $this->page();
-        } elseif ($this->isFile()) {
+        }
+        if ($this->isFile()) {
             return $this->file();
-        } elseif ($this->isStructureObject()) {
+        }
+        if ($this->isStructureObject()) {
             return $this->structureObject();
         }
         return null;
@@ -111,9 +115,11 @@ final class AutoIDItem
     {
         if ($this->isPage()) {
             return $this->page;
-        } elseif ($this->isFile()) {
+        }
+        if ($this->isFile()) {
             return $this->page . '/' . $this->filename;
-        } elseif ($this->isStructureObject()) {
+        }
+        if ($this->isStructureObject()) {
             // tree is not unique post update since its sortable. use autoid as id
             return $this->page . '#' . $this->autoid();
         }

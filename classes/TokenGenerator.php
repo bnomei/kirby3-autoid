@@ -8,7 +8,7 @@ final class TokenGenerator implements AutoIDGenerator
 {
     public function __construct($seed = null)
     {
-        $this->seed = (string)$seed;
+        $this->seed = (string) $seed;
     }
 
     public function generate(int $length = 8, bool $withLower = true, bool $withUpper = false, bool $withNumbers = true): string
@@ -18,17 +18,17 @@ final class TokenGenerator implements AutoIDGenerator
 
         $codeAlphabet = $this->seed;
         if ($withUpper) {
-            $codeAlphabet .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            $codeAlphabet .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         }
         if ($withLower) {
-            $codeAlphabet .= "abcdefghijklmnopqrstuvwxyz";
+            $codeAlphabet .= 'abcdefghijklmnopqrstuvwxyz';
         }
         if ($withNumbers) {
-            $codeAlphabet .= "0123456789";
+            $codeAlphabet .= '0123456789';
         }
         $max = strlen($codeAlphabet);
 
-        $token = "";
+        $token = '';
         for ($i = 0; $i < $length; $i++) {
             $token .= $codeAlphabet[random_int(0, $max - 1)];
         }

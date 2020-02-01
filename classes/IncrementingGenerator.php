@@ -20,12 +20,12 @@ final class IncrementingGenerator implements AutoIDGenerator
     {
         $id = $this->seed;
         $file = self::file();
-        if (!F::exists($file)) {
+        if (! F::exists($file)) {
             F::write($file, $id);
         } else {
             $id = intval(F::read($file));
         }
-        $id = $id + 1;
+        $id += 1;
         // @codeCoverageIgnoreStart
         if (F::write($file, $id) === false) {
             throw new Exception('The file "' . $file . '" is not writable');
@@ -45,7 +45,7 @@ final class IncrementingGenerator implements AutoIDGenerator
         if ($path === null) {
             $path = kirby()->roots()->content() . '/.autoid'; // NOT .txt !!
         }
-        if (!self::$file && $path) {
+        if (! self::$file && $path) {
             self::$file = $path;
         }
         return self::$file;

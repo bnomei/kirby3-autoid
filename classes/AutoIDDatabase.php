@@ -13,8 +13,14 @@ use Kirby\Toolkit\F;
 
 final class AutoIDDatabase
 {
+    /** @var self */
+    private static $singleton;
+
+    /** @var array */
     private $options;
-    private $db;
+
+    /** @var Database */
+    private $database;
 
     public function __construct(array $options = [])
     {
@@ -24,11 +30,11 @@ final class AutoIDDatabase
         ], $options);
 
         $target = $this->options['target'];
-        if (!F::exists($target)) {
+        if (! F::exists($target)) {
             F::copy($this->options['template'], $target);
         }
 
-        $this->db = DB::connect([
+        $this->database = Db::connect([
             'type' => 'sqlite',
             'database' => $target,
         ]);
@@ -36,12 +42,12 @@ final class AutoIDDatabase
 
     public function database(): Database
     {
-        return $this->db;
+        return $this->database;
     }
 
     public function count(): int
     {
-        return count($this->db->query("SELECT rowid FROM AUTOID"));
+        return count($this->database->query('SELECT rowid FROM AUTOID'));
     }
 
     public function find($autoid): ?AutoIDItem
@@ -50,7 +56,7 @@ final class AutoIDDatabase
             $autoid = (string) $autoid->value();
         }
 
-        foreach ($this->db->query("SELECT * FROM AUTOID WHERE autoid = '$autoid'") as $obj) {
+        foreach ($this->database->query("SELECT * FROM AUTOID WHERE autoid = '${autoid}'") as $obj) {
             return new AutoIDItem($obj);
         }
         return null;
@@ -64,7 +70,7 @@ final class AutoIDDatabase
 
         list($page, $filename, $structure) = $this->pageFilenameFromPath($objectid);
 
-        foreach ($this->db->query("SELECT * FROM AUTOID WHERE page = '$page' AND filename = '$filename' AND structure = '$structure'") as $obj) {
+        foreach ($this->database->query("SELECT * FROM AUTOID WHERE page = '${page}' AND filename = '${filename}' AND structure = '${structure}'") as $obj) {
             return new AutoIDItem($obj);
         }
         return null;
@@ -95,18 +101,18 @@ final class AutoIDDatabase
 
     public function modifiedByArray(array $autoids): ?int
     {
-        $list = implode(', ', array_map(function ($autoid) {
-            return "'$autoid'";
+        $list = implode(', ', array_map(static function ($autoid) {
+            return "'${autoid}'";
         }, $autoids));
-        foreach ($this->db->query("SELECT MAX(modified) as maxmod FROM AUTOID WHERE autoid IN ($list)") as $obj) {
+        foreach ($this->database->query("SELECT MAX(modified) as maxmod FROM AUTOID WHERE autoid IN (${list})") as $obj) {
             return intval($obj->maxmod);
         }
         return null;
     }
 
-    public function insertOrUpdate(AutoIDItem $item)
+    public function insertOrUpdate(AutoIDItem $item): void
     {
-        if (!$item) {
+        if (! $item) {
             return;
         }
 
@@ -114,7 +120,7 @@ final class AutoIDDatabase
         $this->deleteByID($item->id());
 
         // enter a new single entry
-        $this->db->query("
+        $this->database->query("
             INSERT INTO AUTOID
             (autoid, modified, page, filename, structure, kind)
             VALUES
@@ -122,25 +128,29 @@ final class AutoIDDatabase
         ");
     }
 
-    public function delete($autoid)
+    public function delete($autoid): void
     {
         if (is_a($autoid, AutoIDItem::class)) {
-            $autoid = (string)$autoid->autoid();
+            $autoid = (string) $autoid->autoid();
         } elseif (is_a($autoid, Field::class)) {
-            $autoid = (string)$autoid->value();
+            $autoid = (string) $autoid->value();
         }
 
-        if (!is_string($autoid)) {
+        if (! is_string($autoid)) {
             return;
         }
 
-        $this->db->query("DELETE FROM AUTOID WHERE autoid = '$autoid'");
+        if (strlen(trim($autoid)) === 0) {
+            return;
+        }
+
+        $this->database->query("DELETE FROM AUTOID WHERE autoid = '${autoid}'");
     }
 
-    public function deleteByID($objectid)
+    public function deleteByID($objectid): void
     {
         if (is_a($objectid, Field::class)) {
-            $objectid = (string)$objectid->value();
+            $objectid = (string) $objectid->value();
         }
 
         list($page, $filename, $structure) = $this->pageFilenameFromPath($objectid);
@@ -149,16 +159,16 @@ final class AutoIDDatabase
             // remove structure by autoid since path to object is not unique
             $this->delete($structure);
         } else {
-            $this->db->query("DELETE FROM AUTOID WHERE page = '$page' AND filename = '$filename'");
+            $this->database->query("DELETE FROM AUTOID WHERE page = '${page}' AND filename = '${filename}'");
         }
     }
 
-    public function flush()
+    public function flush(): void
     {
-        $this->db->query("DELETE FROM AUTOID WHERE autoid != ''");
+        $this->database->query("DELETE FROM AUTOID WHERE autoid != ''");
     }
 
-    private function pageFilenameFromPath(string $objectid)
+    private function pageFilenameFromPath(string $objectid): array
     {
         $page = '';
         $filename = '';
@@ -174,8 +184,6 @@ final class AutoIDDatabase
         }
         return [$page, $filename, $structure];
     }
-
-    private static $singleton;
 
     public static function singleton(array $options = []): self
     {

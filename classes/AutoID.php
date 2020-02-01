@@ -51,36 +51,43 @@ final class AutoID
         return $process->isIndexed();
     }
 
-    public static function remove($object)
+    public static function remove($object): void
     {
         $autoid = $object;
         if (is_a($object, Page::class) ||
             is_a($object, File::class)
         ) {
             $autoid = $object->{self::FIELDNAME}();
-            if ($autoid->isEmpty()) {
-                return;
-            }
         }
 
         AutoIDDatabase::singleton()->delete($autoid);
     }
 
-    public static function flush()
+    public static function flush(): void
     {
         AutoIDDatabase::singleton()->flush();
     }
 
+    /**
+     * @param $autoid
+     *
+     * @return array|File|Page|null
+     */
     public static function find($autoid)
     {
         // self::index(); // NOTE: would cause loop
         $find = AutoIDDatabase::singleton()->find($autoid);
-        if (!$find) {
+        if (! $find) {
             $find = AutoIDDatabase::singleton()->findByID($autoid);
         }
         return $find ? $find->toObject() : null;
     }
 
+    /**
+     * @param $objectid
+     *
+     * @return array|File|Page|null
+     */
     public static function findByID($objectid)
     {
         // self::index(); // NOTE: would cause loop
@@ -88,6 +95,11 @@ final class AutoID
         return $find ? $find->toObject() : null;
     }
 
+    /**
+     * @param $autoid
+     *
+     * @return int|null
+     */
     public static function modified($autoid)
     {
         if (is_string($autoid) || is_a($autoid, Field::class)) {
@@ -101,9 +113,8 @@ final class AutoID
         if (is_a($autoid, Page::class) || is_a($autoid, File::class)) {
             if ($autoid->{AutoID::FIELDNAME}()->isNotEmpty()) {
                 return self::modified($autoid->{AutoID::FIELDNAME}());
-            } else {
-                return $autoid->modified();
             }
+            return $autoid->modified();
         }
 
         if ($autoid instanceof Iterator) {
@@ -120,7 +131,7 @@ final class AutoID
         return null;
     }
 
-    public static function tinyurl($autoid)
+    public static function tinyurl($autoid): string
     {
         $url = option('bnomei.autoid.tinyurl.url');
         if ($url && is_callable($url)) {

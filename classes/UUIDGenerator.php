@@ -12,16 +12,18 @@ final class UUIDGenerator implements AutoIDGenerator
 
     public function __construct($name = null)
     {
-        $this->name = (string)$name;
+        $this->name = (string) $name;
     }
 
     public function generate(int $version = 5): string
     {
         if ($version >= 5) {
             return Uuid::uuid5(Uuid::NAMESPACE_DNS, $this->name)->toString();
-        } elseif ($version === 4) {
+        }
+        if ($version === 4) {
             return Uuid::uuid4()->toString();
-        } elseif ($version === 3) {
+        }
+        if ($version === 3) {
             return Uuid::uuid3(Uuid::NAMESPACE_DNS, $this->name)->toString();
         }
 
