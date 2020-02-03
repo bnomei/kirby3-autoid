@@ -51,6 +51,9 @@ final class AutoID
 
     public static function push($object, bool $overwrite = false): bool
     {
+        if (! $object) {
+            return false;
+        }
         $process = new AutoIDProcess($object, $overwrite);
         return $process->isIndexed();
     }
