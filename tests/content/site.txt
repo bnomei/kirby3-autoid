@@ -1,0 +1,15 @@
+Title: Site Title
+
+----
+
+Taxonomy:
+
+-
+  title: tax-b
+  autoid: nkynjlfl
+-
+  title: tax-a
+  autoid: 3w831ukc
+-
+  title: tax-c
+  autoid: 7tcy23qd

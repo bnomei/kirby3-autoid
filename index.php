@@ -138,5 +138,8 @@ Kirby::plugin('bnomei/autoid', [
         'file.delete:before' => function ($file) {
             \Bnomei\AutoID::remove($file);
         },
+        'site.update:after' => function ($newSite, $oldSite) {
+            \Bnomei\AutoID::push($newSite);
+        },
     ],
 ]);

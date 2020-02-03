@@ -6,6 +6,9 @@ namespace Bnomei;
 
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
+use Kirby\Cms\Site;
+use Kirby\Cms\StructureObject;
+use Kirby\Toolkit\A;
 use Kirby\Toolkit\Obj;
 
 final class AutoIDItem
@@ -35,9 +38,13 @@ final class AutoIDItem
         return intval($this->data->modified);
     }
 
-    public function page(): ?Page
+    /**
+     * @return Page|Site|null
+     */
+    public function page()
     {
-        return page($this->data->page);
+        $id = $this->data->page;
+        return $id === '$' ? site() : page($this->data->page);
     }
 
     public function file(): ?File
@@ -49,34 +56,23 @@ final class AutoIDItem
         return null;
     }
 
-    public function structureObject(): array
+    public function structureObject(): ?StructureObject
     {
         $tree = array_map(static function ($value) {
             return is_numeric($value) ? intval($value) : $value;
         }, explode(',', $this->structure));
 
-        return $tree;
+        $root = array_shift($tree);
+        $fieldArray = $this->page()->{$root}()->yaml();
 
-        // TODO: return recursive Structure Field or value?
-//        $tree = explode(',', $this->structure);
-//        $root = array_shift($tree);
-//        $field = $this->page()->{$root}();
-//
-//        foreach ($tree as $leaf) {
-//            if ($field->isNotEmpty()) {
-//                foreach ($field->toStructure() as $obj) {
-//                    if ($obj->{$leaf}()->isNotEmpty()) {
-//                        $field = $obj;
-//                    } else {
-//                        return null;
-//                    }
-//                }
-//            } else {
-//                return null;
-//            }
-//        }
-//
-//        return $field;
+        foreach ($tree as $leaf) {
+            $fieldArray = A::get($fieldArray, $leaf);
+        }
+        return new StructureObject([
+            'id' => $this->autoid(),
+            'content' => $fieldArray,
+            'parent' => $this->self(),
+        ]);
     }
 
     public function isPage(): bool
@@ -114,16 +110,30 @@ final class AutoIDItem
     public function id(): ?string
     {
         if ($this->isPage()) {
-            return $this->page;
+            return $this->data->page;
         }
         if ($this->isFile()) {
-            return $this->page . '/' . $this->filename;
+            return $this->data->page . '/' . $this->filename;
         }
         if ($this->isStructureObject()) {
             // tree is not unique post update since its sortable. use autoid as id
-            return $this->page . '#' . $this->autoid();
+            return $this->data->page . '#' . $this->autoid();
         }
 
+        return null;
+    }
+
+    /**
+     * @return File|Page|Site|null
+     */
+    public function self()
+    {
+        if ($this->isPage() || $this->isStructureObject()) {
+            return $this->page();
+        }
+        if ($this->isFile()) {
+            return $this->file();
+        }
         return null;
     }
 

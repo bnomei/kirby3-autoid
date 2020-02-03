@@ -1,0 +1,10 @@
+fields:
+  taxonomy:
+    type: structure
+    translate: false
+    fields:
+      title:
+        label: Titel
+        type: text
+      autoid:
+        type: autoid

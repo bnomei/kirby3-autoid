@@ -7,6 +7,7 @@ namespace Bnomei;
 use Exception;
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
+use Kirby\Cms\Site;
 use Kirby\Data\Yaml;
 use Kirby\Toolkit\A;
 
@@ -61,12 +62,16 @@ final class AutoIDProcess
                 $this->update[AutoID::FIELDNAME] = $autoid;
                 $this->autoids[] = $autoid;
                 $this->hasChanges = true;
+            } else {
+                $autoid = null;
             }
         }
 
-        AutoIDDatabase::singleton()->insertOrUpdate(
-            $this->createItem($autoid)
-        );
+        if ($autoid) {
+            AutoIDDatabase::singleton()->insertOrUpdate(
+                $this->createItem($autoid)
+            );
+        }
     }
 
     private function indexStructures(): void
@@ -148,7 +153,12 @@ final class AutoIDProcess
 
     private function createItem(string $autoid, array $tree = null): AutoIDItem
     {
-        if (is_array($tree) && is_a($this->object, Page::class)) {
+        if (is_array($tree) && (
+                is_a($this->object, Page::class) ||
+                is_a($this->object, File::class) ||
+                is_a($this->object, Site::class)
+            )
+        ) {
             $data = $this->itemFromStructureObject($this->object, $tree);
         } elseif (is_a($this->object, Page::class)) {
             $data = $this->itemFromPage($this->object);
@@ -183,7 +193,7 @@ final class AutoIDProcess
     private function itemFromStructureObject($object, array $tree): array
     {
         return [
-            'page' => $object->id(),
+            'page' => is_a($this->object, Site::class) ? '$' : $object->id(),
             'modified' => $object->modified(),
             'structure' => implode(',', $tree),
             'kind' => AutoIDItem::KIND_STRUCTUREOBJECT,

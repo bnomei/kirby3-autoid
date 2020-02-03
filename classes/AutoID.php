@@ -35,6 +35,10 @@ final class AutoID
         $indexed = 0;
         if (AutoIDDatabase::singleton()->count() === 0 || $force) {
             set_time_limit(0);
+            // site
+            if (self::push(site())) {
+                $indexed++;
+            }
             // all but drafts
             foreach (site()->pages()->index() as $page) {
                 if (self::push($page)) {

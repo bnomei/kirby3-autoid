@@ -163,6 +163,8 @@ category:
     value: "{{ structureItem.autoid }}"
 ```
 
+> TIP: This works from structures defined in the site blueprint as well (since v2.2.0).
+
 **Find Page/File-Object in PHP**
 
 ```php
@@ -174,8 +176,13 @@ $result = $page->myFieldWithAutoIDReference()->fromAutoID(); // fieldMethod
 
 if(is_a($result, 'Kirby\Cms\Page')) {
     // got a Page
-} else if(is_a($result, 'Kirby\Cms\File')) {
+} elseif(is_a($result, 'Kirby\Cms\File')) {
     // got a File
+} elseif(is_a($result, 'Kirby\Cms\StructureObject')) {
+    // got a StructureObject
+    // $result->myFieldname()
+    // $result->id: $autoid
+    // $result->parent: Site|Page-Object hosting the Structure
 }
 ```
 

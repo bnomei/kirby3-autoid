@@ -258,4 +258,20 @@ final class AutoidTest extends TestCase
         AutoID::remove($dup);
         $dup->delete(true);
     }
+
+    public function testSite()
+    {
+        AutoID::index(true);
+
+        $taxonomies = site()->taxonomy()->yaml();
+        $randIdx = rand(0, count($taxonomies)-1);
+        $randomTax = $taxonomies[$randIdx];
+        $randID = $randomTax['autoid'];
+        $find = \autoid($randID);
+
+        $this->assertInstanceOf(\Kirby\Cms\StructureObject::class, $find);
+        $this->assertEquals($randID, $find->id());
+        $this->assertEquals(site(), $find->parent());
+        $this->assertEquals($randomTax['title'], $find->title());
+    }
 }
