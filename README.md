@@ -209,6 +209,13 @@ $autoidOfFile = autoid($file);
 
 > ATTENTION: This only works in version 2 of this plugin.
 
+**Force Re-Index**
+Calling the following line anywhere whithin your code (Controller, Template, Snippet,...) will force the `site()->index()` to be crawled again. It will not remove any entries from the AutoID-Index just add new entries.
+
+```php
+\Bnomei\AutoID::index(true);
+```
+
 
 ## Usage modified()
 
