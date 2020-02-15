@@ -34,6 +34,7 @@ This plugin is free (MIT license) but if you use it in a commercial project plea
 - unzip [master.zip](https://github.com/bnomei/kirby3-autoid/archive/master.zip) as folder `site/plugins/kirby3-autoid` or
 - `git submodule add https://github.com/bnomei/kirby3-autoid.git site/plugins/kirby3-autoid` or
 - `composer require bnomei/kirby3-autoid`
+- AutoID uses a SQLite database to cache its index.
 
 ## Why AutoID
 
@@ -211,7 +212,7 @@ $autoidOfFile = autoid($file);
 
 **Force Re-Index**
 
-Calling the following line anywhere within your code (Controller, Template, Snippet,...) will force the `site()->index()` to be crawled again. It will not remove any entries from the AutoID-Index just add new entries.
+Calling the following line anywhere within your code (Controller, Template, Snippet,...) will force the `site()->index()` to be crawled again. It will not remove any entries from the AutoID-Index (a SQLite file in the plugins cache folder) just add new entries.
 
 ```php
 \Bnomei\AutoID::index(true);
