@@ -26,7 +26,9 @@
     "performance",
     "tiny-url",
     "structures",
-    "nested"
+    "nested",
+    "sqlite",
+    "sqlite-database"
   ],
   "autoload": {
     "psr-4": {
