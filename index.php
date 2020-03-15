@@ -20,9 +20,12 @@ if (! function_exists('autoid')) {
         }
         if (is_a($obj, 'Kirby\Cms\Page') ||
             is_a($obj, 'Kirby\Cms\File')) {
-            $find = \Bnomei\AutoID::find(
-                $obj->{\Bnomei\AutoID::FIELDNAME}()
-            );
+            $find = null;
+            if ($obj->{\Bnomei\AutoID::FIELDNAME}()->isNotEmpty()) {
+                \Bnomei\AutoID::find(
+                    $obj->{\Bnomei\AutoID::FIELDNAME}()
+                );
+            }
             if (! $find) {
                 \Bnomei\AutoID::push($obj);
                 $find = \Bnomei\AutoID::findByID($obj->id());
@@ -36,6 +39,11 @@ if (! function_exists('autoid')) {
     {
         \Bnomei\AutoID::index();
         return \Bnomei\AutoID::modified($autoid);
+    }
+
+    function searchForTemplate(string $template, string $rootId = ''): \Kirby\Cms\Collection
+    {
+        return \Bnomei\AutoIDDatabase::singleton()->findByTemplate($template, $rootId);
     }
 }
 
@@ -56,7 +64,7 @@ Kirby::plugin('bnomei/autoid', [
         'tinyurl.folder' => 'x',
     ],
     'pageMethods' => [ // PAGE
-        'tinyurl' => function () {
+        'tinyurl' => function (): string {
             $url = \Bnomei\AutoID::tinyurl(
                 $this->{\Bnomei\AutoID::FIELDNAME}()
             );
@@ -65,7 +73,7 @@ Kirby::plugin('bnomei/autoid', [
             }
             return site()->errorPage()->url();
         },
-        'tinyUrl' => function () {
+        'tinyUrl' => function (): string {
             $url = \Bnomei\AutoID::tinyurl(
                 $this->{\Bnomei\AutoID::FIELDNAME}()
             );
@@ -73,11 +81,19 @@ Kirby::plugin('bnomei/autoid', [
                 return $url;
             }
             return site()->errorPage()->url();
+        },
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Collection {
+            return searchForTemplate($template, $this->id());
         },
     ],
     'pagesMethods' => [ // PAGES not PAGE
         'autoid' => function ($autoid) {
             return autoid($autoid);
+        },
+    ],
+    'siteMethods' => [
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Collection {
+            return searchForTemplate($template, '/');
         },
     ],
     'fieldMethods' => [

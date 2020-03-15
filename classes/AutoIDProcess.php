@@ -177,6 +177,7 @@ final class AutoIDProcess
             'page' => $object->id(),
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_PAGE,
+            'template' => (string) $object->intendedTemplate(),
         ];
     }
 
@@ -187,6 +188,7 @@ final class AutoIDProcess
             'filename' => $object->filename(),
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_FILE,
+            'template' => (string) $object->template(),
         ];
     }
 
@@ -197,6 +199,7 @@ final class AutoIDProcess
             'modified' => $object->modified(),
             'structure' => implode(',', $tree),
             'kind' => AutoIDItem::KIND_STRUCTUREOBJECT,
+            'template' => 'structureobject',
         ];
     }
 }

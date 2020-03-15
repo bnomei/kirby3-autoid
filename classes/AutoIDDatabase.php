@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bnomei;
 
 use Kirby\Cache\FileCache;
+use Kirby\Cms\Collection;
 use Kirby\Cms\Field;
 use Kirby\Database\Database;
 use Kirby\Database\Db;
@@ -25,8 +26,8 @@ final class AutoIDDatabase
     public function __construct(array $options = [])
     {
         $this->options = array_merge([
-            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-1-0.sqlite',
-            'target' => self::cacheFolder() . '/autoid-v2-1-0.sqlite',
+            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-3-0.sqlite',
+            'target' => self::cacheFolder() . '/autoid-v2-3-0.sqlite',
         ], $options);
 
         $target = $this->options['target'];
@@ -76,6 +77,20 @@ final class AutoIDDatabase
         return null;
     }
 
+    public function findByTemplate(string $template, string $rootId = ''): Collection
+    {
+        $rootId = ltrim($rootId, '/');
+        if (strlen($rootId) > 0) {
+            $rootId = " AND page LIKE '${rootId}%' AND page != '${rootId}'";
+        }
+        $results = [];
+        $str = "SELECT * FROM AUTOID WHERE template = '${template}'" . $rootId;
+        foreach ($this->database->query($str) as $obj) {
+            $results[] = (new AutoIDItem($obj))->toObject();
+        }
+        return new Collection($results);
+    }
+
     public function exists($autoid): bool
     {
         if (is_a($autoid, Field::class)) {
@@ -122,9 +137,9 @@ final class AutoIDDatabase
         // enter a new single entry
         $this->database->query("
             INSERT INTO AUTOID
-            (autoid, modified, page, filename, structure, kind)
+            (autoid, modified, page, filename, structure, kind, template)
             VALUES
-            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}')
+            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}')
         ");
     }
 
@@ -159,7 +174,8 @@ final class AutoIDDatabase
             // remove structure by autoid since path to object is not unique
             $this->delete($structure);
         } else {
-            $this->database->query("DELETE FROM AUTOID WHERE page = '${page}' AND filename = '${filename}'");
+            $str = "DELETE FROM AUTOID WHERE page = '${page}' AND filename = '${filename}'";
+            $this->database->query($str);
         }
     }
 
@@ -173,6 +189,7 @@ final class AutoIDDatabase
         $page = '';
         $filename = '';
         $structure = '';
+
         if (pathinfo($objectid, PATHINFO_EXTENSION)) {
             $pathinfo = pathinfo($objectid);
             $page = $pathinfo['dirname'];
@@ -182,6 +199,7 @@ final class AutoIDDatabase
             $page = $pathinfo['dirname'] === '.' ? $pathinfo['basename'] : $pathinfo['dirname'] . '/' . $pathinfo['basename'];
             $structure = strpos($page, '#') !== false ? explode('#', $page)[1] : '';
         }
+
         return [$page, $filename, $structure];
     }
 

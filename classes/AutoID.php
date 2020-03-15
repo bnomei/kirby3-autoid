@@ -22,7 +22,7 @@ final class AutoID
             while ($break > 0) {
                 $break--;
                 $newid = $generator();
-                if (AutoID::find($newid) === null) {
+                if (AutoIDDatabase::singleton()->exists($newid) === false) {
                     return $newid;
                 }
             }
@@ -60,14 +60,15 @@ final class AutoID
 
     public static function remove($object): void
     {
-        $autoid = $object;
+        if (is_string($object)) {
+            AutoIDDatabase::singleton()->delete($object);
+        }
+
         if (is_a($object, Page::class) ||
             is_a($object, File::class)
         ) {
-            $autoid = $object->{self::FIELDNAME}();
+            AutoIDDatabase::singleton()->deleteByID($object->id());
         }
-
-        AutoIDDatabase::singleton()->delete($autoid);
     }
 
     public static function flush(): void

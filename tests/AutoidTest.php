@@ -6,6 +6,7 @@ use Bnomei\AutoID;
 use Bnomei\AutoIDDatabase;
 use Kirby\Cms\File;
 use Kirby\Cms\Page;
+use Kirby\Cms\StructureObject;
 use Kirby\Toolkit\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -16,6 +17,8 @@ final class AutoidTest extends TestCase
 
     public function setUp(): void
     {
+        $this->filepath = __DIR__ . '/flowers.jpg';
+
         // AutoID::index(true);
     }
 
@@ -24,7 +27,6 @@ final class AutoidTest extends TestCase
         AutoID::flush();
 
         $this->depth = 3;
-        $this->filepath = __DIR__ . '/flowers.jpg';
 
         if (site()->pages()->index()->notTemplate('home')->count() === 0) {
             for ($i = 0; $i < $this->depth; $i++) {
@@ -34,7 +36,7 @@ final class AutoidTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function createPage($parent, int $idx, int $depth = 3)
+    public function createPage($parent, int $idx, int $depth = 3): Page
     {
         $id = 'Test ' . abs(crc32(microtime() . $idx . $depth));
         /* @var $page Page */
@@ -74,6 +76,8 @@ final class AutoidTest extends TestCase
                 $this->createPage($page, $i, $depth);
             }
         }
+
+        return $page;
     }
 
     public function randomPage(): ?Page
@@ -269,9 +273,43 @@ final class AutoidTest extends TestCase
         $randID = $randomTax['autoid'];
         $find = \autoid($randID);
 
-        $this->assertInstanceOf(\Kirby\Cms\StructureObject::class, $find);
+        $this->assertInstanceOf(StructureObject::class, $find);
         $this->assertEquals($randID, $find->id());
         $this->assertEquals(site(), $find->parent());
         $this->assertEquals($randomTax['title'], $find->title());
+    }
+
+    public function testCreateAndRetrieveAutoID()
+    {
+        $newPage = $this->createPage(page('home'),0 ,0);
+
+        // autoid is null since object is not the one past the update hook
+        $this->assertTrue($newPage->autoid()->isEmpty());
+
+        $this->assertRegExp('/.{8}/', \autoid($newPage->id()));
+        $this->assertRegExp('/.{8}/', \autoid($newPage));
+
+        $autoid = \autoid($newPage)->autoid()->value();
+        $this->assertTrue($newPage->delete(true));
+        $this->assertNull(\autoid($autoid));
+    }
+
+    public function testFindByTemplate()
+    {
+        AutoID::index(true);
+
+        $randomPage = $this->randomPage();
+        $collection = AutoIDDatabase::singleton()->findByTemplate(
+            'autoidtest',
+            $randomPage->id()
+        );
+        $this->assertEquals($randomPage->index()->not($randomPage)->count(), $collection->count());
+
+        $randomPage = $this->randomPage();
+        $collection = $randomPage->searchForTemplate('autoidtest');
+        $this->assertEquals($randomPage->index()->not($randomPage)->count(), $collection->count());
+
+        $collection = site()->searchForTemplate('autoidtest');
+        $this->assertEquals(site()->index()->notTemplate('home')->count(), $collection->count());
     }
 }
