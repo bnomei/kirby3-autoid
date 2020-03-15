@@ -32,8 +32,10 @@ class AutoIDProcessTest extends TestCase
     public function testProcessFileOverwrite()
     {
         $file = $this->randomFile();
-        $process = new AutoIDProcess($file, true);
 
+        // NOTE: this will change ONE file per test run.
+        // will show up in git and can be reverted.
+        $process = new AutoIDProcess($file, true);
         $this->assertTrue($process->isIndexed());
     }
 }
