@@ -22,7 +22,7 @@ if (! function_exists('autoid')) {
             is_a($obj, 'Kirby\Cms\File')) {
             $find = null;
             if ($obj->{\Bnomei\AutoID::FIELDNAME}()->isNotEmpty()) {
-                \Bnomei\AutoID::find(
+                $find = \Bnomei\AutoID::find(
                     $obj->{\Bnomei\AutoID::FIELDNAME}()
                 );
             }
