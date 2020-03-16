@@ -35,7 +35,7 @@ final class AutoIDDatabase
             F::copy($this->options['template'], $target);
         }
 
-        $this->database = Db::connect([
+        $this->database = new Database([
             'type' => 'sqlite',
             'database' => $target,
         ]);
