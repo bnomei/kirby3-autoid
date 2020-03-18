@@ -88,6 +88,16 @@ final class AutoID
         if (! $find) {
             $find = AutoIDDatabase::singleton()->findByID($autoid);
         }
+        if(! $find) {
+            if($page = site()->index()->filterBy(self::FIELDNAME, $autoid)->first()) {
+                self::push($page);
+                return $page;
+            }
+            if($file = site()->index()->files()->filterBy(self::FIELDNAME, $autoid)->first()) {
+                self::push($file);
+                return $file;
+            }
+        }
         return $find ? $find->toObject() : null;
     }
 
