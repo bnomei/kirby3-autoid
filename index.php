@@ -116,7 +116,7 @@ Kirby::plugin('bnomei/autoid', [
     ],
     'fieldMethods' => [
         'fromAutoID' => function ($field) {
-            return autoid($field);
+            return autoid($field->model()->AUTOID());
         },
     ],
     'fields' => [
