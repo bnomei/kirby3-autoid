@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7aa785162900f2f78c9ab2dcea5e3bc4",
+    "content-hash": "c8b13deebf13a33b80ebeb902a47ed6b",
     "packages": [
         {
             "name": "getkirby/composer-installer",
@@ -967,16 +967,16 @@
         },
         {
             "name": "getkirby/cms",
-            "version": "3.3.4",
+            "version": "3.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getkirby/kirby.git",
-                "reference": "0330c0ae4214cde349710b099a770fffd0971b4e"
+                "reference": "a7f2f9695509ad6f7e407c5214b0a7aff0b99039"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getkirby/kirby/zipball/0330c0ae4214cde349710b099a770fffd0971b4e",
-                "reference": "0330c0ae4214cde349710b099a770fffd0971b4e",
+                "url": "https://api.github.com/repos/getkirby/kirby/zipball/a7f2f9695509ad6f7e407c5214b0a7aff0b99039",
+                "reference": "a7f2f9695509ad6f7e407c5214b0a7aff0b99039",
                 "shasum": ""
             },
             "require": {
@@ -1022,7 +1022,7 @@
                 "core",
                 "kirby"
             ],
-            "time": "2020-02-18T08:42:36+00:00"
+            "time": "2020-03-17T13:15:27+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2469,16 +2469,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.14",
+            "version": "0.12.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "37bdd26a80235d0f9045b49f4151102b7831cbe2"
+                "reference": "b2c37bda79fdb11d801ce208ce391cffc0f572e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/37bdd26a80235d0f9045b49f4151102b7831cbe2",
-                "reference": "37bdd26a80235d0f9045b49f4151102b7831cbe2",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b2c37bda79fdb11d801ce208ce391cffc0f572e6",
+                "reference": "b2c37bda79fdb11d801ce208ce391cffc0f572e6",
                 "shasum": ""
             },
             "require": {
@@ -2504,7 +2504,21 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2020-03-02T22:29:43+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpstan",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpstan/phpstan",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-03-17T15:39:11+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

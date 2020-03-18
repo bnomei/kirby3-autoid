@@ -286,8 +286,11 @@ final class AutoidTest extends TestCase
         // autoid is null since object is not the one past the update hook
         $this->assertTrue($newPage->autoid()->isEmpty());
 
-        $this->assertRegExp('/.{8}/', \autoid($newPage->id()));
-        $this->assertRegExp('/.{8}/', \autoid($newPage));
+        // but AUTOID pagemethod should register and retrieve non the less
+        $this->assertRegExp('/^.{8}$/', $newPage->AUTOID());
+
+        // $this->assertRegExp('/^.{8}$/', \autoid($newPage->id())); // not fields
+        $this->assertRegExp('/^.{8}$/', \autoid($newPage)->autoid()->value());
 
         $autoid = \autoid($newPage)->autoid()->value();
         $this->assertTrue($newPage->delete(true));
