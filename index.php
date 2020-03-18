@@ -63,6 +63,17 @@ Kirby::plugin('bnomei/autoid', [
         },
         'tinyurl.folder' => 'x',
     ],
+    'fileMethods' => [ // FILE
+        'AUTOID' => function () { // casesensitive
+            if ($this->autoid()->isEmpty()) {
+                \Bnomei\AutoID::push($this);
+                return \Bnomei\AutoIDDatabase::singleton()->findByID($this->id())->autoid();
+            }
+            /** @var \Kirby\Cms\Page $this */
+
+            return $this->autoid()->value();
+        },
+    ],
     'pageMethods' => [ // PAGE
         'AUTOID' => function () { // casesensitive
             if ($this->autoid()->isEmpty()) {
