@@ -65,23 +65,21 @@ Kirby::plugin('bnomei/autoid', [
     ],
     'fileMethods' => [ // FILE
         'AUTOID' => function () { // casesensitive
-            if ($this->autoid()->isEmpty()) {
+            $db = \Bnomei\AutoIDDatabase::singleton();
+            if (! $db->exists($this->autoid())) {
                 \Bnomei\AutoID::push($this);
-                return \Bnomei\AutoIDDatabase::singleton()->findByID($this->id())->autoid();
+                return $db->findByID($this->id())->autoid();
             }
-            /** @var \Kirby\Cms\Page $this */
-
             return $this->autoid()->value();
         },
     ],
     'pageMethods' => [ // PAGE
         'AUTOID' => function () { // casesensitive
-            if ($this->autoid()->isEmpty()) {
+            $db = \Bnomei\AutoIDDatabase::singleton();
+            if (! $db->exists($this->autoid())) {
                 \Bnomei\AutoID::push($this);
-                return \Bnomei\AutoIDDatabase::singleton()->findByID($this->id())->autoid();
+                return $db->findByID($this->id())->autoid();
             }
-            /** @var \Kirby\Cms\Page $this */
-
             return $this->autoid()->value();
         },
         'tinyurl' => function (): string {
