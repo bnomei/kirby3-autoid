@@ -22,6 +22,10 @@ final class AutoIDDatabase
 
     /** @var Database */
     private $database;
+    /**
+     * @var int
+     */
+    private $count;
 
     public function __construct(array $options = [])
     {
@@ -48,7 +52,15 @@ final class AutoIDDatabase
 
     public function count(): int
     {
-        return count($this->database->query('SELECT rowid FROM AUTOID'));
+        if (! is_null($this->count)) {
+            // fastest
+            return $this->count;
+        }
+        // faster
+        $this->count = intval($this->database->query('SELECT count(*) as count FROM AUTOID')->first()->count);
+        return $this->count;
+        // slow
+        // return count($this->database->query('SELECT rowid FROM AUTOID'));
     }
 
     public function find($autoid): ?AutoIDItem
@@ -141,6 +153,7 @@ final class AutoIDDatabase
             VALUES
             ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}')
         ");
+        $this->count = null;
     }
 
     public function delete($autoid): void
@@ -160,6 +173,7 @@ final class AutoIDDatabase
         }
 
         $this->database->query("DELETE FROM AUTOID WHERE autoid = '${autoid}'");
+        $this->count = null;
     }
 
     public function deleteByID($objectid): void
@@ -176,12 +190,14 @@ final class AutoIDDatabase
         } else {
             $str = "DELETE FROM AUTOID WHERE page = '${page}' AND filename = '${filename}'";
             $this->database->query($str);
+            $this->count = null;
         }
     }
 
     public function flush(): void
     {
         $this->database->query("DELETE FROM AUTOID WHERE autoid != ''");
+        $this->count = null;
     }
 
     private function pageFilenameFromPath(string $objectid): array
