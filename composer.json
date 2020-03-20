@@ -73,5 +73,8 @@
   },
   "extra": {
     "kirby-cms-path": "tests/kirby"
+  },
+  "suggest": {
+    "bnomei/kirby3-bolt": "For a faster page lookup even with big content trees"
   }
 }
