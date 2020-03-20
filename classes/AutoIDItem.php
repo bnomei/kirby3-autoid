@@ -49,6 +49,7 @@ final class AutoIDItem
 
     private function findPage(string $id): ?Page
     {
+        $page = null;
         if (function_exists('bolt')) {
             $page = \bolt($id);
         }
