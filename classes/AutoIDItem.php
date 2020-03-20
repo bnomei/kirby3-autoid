@@ -44,7 +44,15 @@ final class AutoIDItem
     public function page()
     {
         $id = $this->data->page;
-        return $id === '$' ? site() : page($this->data->page);
+        return $id === '$' ? site() : $this->findPage($this->data->page);
+    }
+
+    private function findPage(string $id): ?Page
+    {
+        if (function_exists('bolt')) {
+            $page = \bolt($id);
+        }
+        return $page ? $page : page($id);
     }
 
     public function file(): ?File
