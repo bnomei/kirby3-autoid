@@ -28,7 +28,7 @@ final class AutoidTest extends TestCase
 
         $this->depth = 3;
 
-        if (site()->pages()->index()->notTemplate('home')->count() === 0) {
+        if (site()->pages()->children()->notTemplate('home')->count() === 0) {
             for ($i = 0; $i < $this->depth; $i++) {
                 $this->createPage(site(), $i, $this->depth);
             }

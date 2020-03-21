@@ -135,7 +135,8 @@ final class AutoIDProcess
 
         try {
             kirby()->impersonate('kirby');
-            $this->object->update($this->update);
+            // use save() not update() to avoid hooks
+            $this->object->save($this->update);
         } catch (Exception $exception) {
             $this->revert();
         } finally {
