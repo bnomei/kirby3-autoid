@@ -155,6 +155,7 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::push($newPage, true);
         },
         'page.changeSlug:after' => function ($newPage, $oldPage) {
+            \Bnomei\AutoID::remove($oldPage);
             \Bnomei\AutoID::push($newPage);
         },
         'page.delete:before' => function ($page) {
@@ -164,15 +165,18 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::push($file);
         },
         'file.update:after' => function ($newFile, $oldFile) {
+            \Bnomei\AutoID::remove($oldFile);
             \Bnomei\AutoID::push($newFile);
         },
         'file.changeName:after' => function ($newFile, $oldFile) {
+            \Bnomei\AutoID::remove($oldFile);
             \Bnomei\AutoID::push($newFile);
         },
         'file.delete:before' => function ($file) {
             \Bnomei\AutoID::remove($file);
         },
         'site.update:after' => function ($newSite, $oldSite) {
+            \Bnomei\AutoID::remove($oldSite);
             \Bnomei\AutoID::push($newSite);
         },
     ],

@@ -30,8 +30,8 @@ final class AutoIDDatabase
     public function __construct(array $options = [])
     {
         $this->options = array_merge([
-            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-3-0.sqlite',
-            'target' => self::cacheFolder() . '/autoid-v2-3-0.sqlite',
+            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-4-9.sqlite',
+            'target' => self::cacheFolder() . '/autoid-v2-4-9.sqlite',
         ], $options);
 
         $target = $this->options['target'];
@@ -43,6 +43,11 @@ final class AutoIDDatabase
             'type' => 'sqlite',
             'database' => $target,
         ]);
+    }
+
+    public function databaseFile(): string
+    {
+        return $this->options['target'];
     }
 
     public function database(): Database
@@ -128,23 +133,29 @@ final class AutoIDDatabase
 
     public function modifiedByArray(array $autoids): ?int
     {
+        $modified = null;
         $list = implode(', ', array_map(static function ($autoid) {
             return "'${autoid}'";
         }, $autoids));
         foreach ($this->database->query("SELECT MAX(modified) as maxmod FROM AUTOID WHERE autoid IN (${list})") as $obj) {
-            return intval($obj->maxmod);
+            $modified = intval($obj->maxmod);
         }
-        return null;
+        return $modified === 0 ? null : $modified;
     }
 
     public function insertOrUpdate(AutoIDItem $item): void
     {
-        if (! $item) {
-            return;
+        // remove all entries for item in db
+        $current = $this->find($item->autoid());
+        if ($current && $current->id() !== $item->id()) {
+            $this->deleteByID($current->id());
         }
 
         // remove all with same page AND file props (even if empty)
         $this->deleteByID($item->id());
+
+        // remove with same autoid
+        $this->delete($item->autoid());
 
         // enter a new single entry
         $this->database->query("
