@@ -149,12 +149,29 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::push($page);
         },
         'page.update:after' => function ($newPage, $oldPage) {
+            \Bnomei\AutoID::remove($oldPage);
             \Bnomei\AutoID::push($newPage);
         },
         'page.duplicate:after' => function ($newPage) {
             \Bnomei\AutoID::push($newPage, true);
         },
+        'page.changeNum:after' => function ($newPage, $oldPage) {
+            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::push($newPage);
+        },
         'page.changeSlug:after' => function ($newPage, $oldPage) {
+            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::push($newPage);
+        },
+        'page.changeStatus:after' => function ($newPage, $oldPage) {
+            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::push($newPage);
+        },
+        'page.changeTemplate:after' => function ($newPage, $oldPage) {
+            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::push($newPage);
+        },
+        'page.changeTitle:after' => function ($newPage, $oldPage) {
             \Bnomei\AutoID::remove($oldPage);
             \Bnomei\AutoID::push($newPage);
         },
@@ -168,7 +185,15 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::remove($oldFile);
             \Bnomei\AutoID::push($newFile);
         },
+        'file.replace:after' => function ($newFile, $oldFile) {
+            \Bnomei\AutoID::remove($oldFile);
+            \Bnomei\AutoID::push($newFile);
+        },
         'file.changeName:after' => function ($newFile, $oldFile) {
+            \Bnomei\AutoID::remove($oldFile);
+            \Bnomei\AutoID::push($newFile);
+        },
+        'file.changeSort:after' => function ($newFile, $oldFile) {
             \Bnomei\AutoID::remove($oldFile);
             \Bnomei\AutoID::push($newFile);
         },
