@@ -6,6 +6,7 @@ namespace Bnomei;
 
 use Kirby\Cms\Field;
 use Kirby\Cms\File;
+use Kirby\Cms\FileVersion;
 use Kirby\Cms\Page;
 use Kirby\Toolkit\Iterator;
 
@@ -128,9 +129,12 @@ final class AutoID
             return AutoIDDatabase::singleton()->modifiedByArray($autoid);
         }
 
-        if (is_a($autoid, Page::class) || is_a($autoid, File::class)) {
+        if (is_a($autoid, Page::class) ||
+            is_a($autoid, File::class) ||
+            is_a($autoid, FileVersion::class)) {
             if ($autoid->{AutoID::FIELDNAME}()->isNotEmpty()) {
-                return self::modified($autoid->{AutoID::FIELDNAME}());
+                // make sure it exists using AUTOID (in caps)
+                return self::modified($autoid->AUTOID());
             }
             return $autoid->modified();
         }
