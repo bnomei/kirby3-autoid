@@ -77,25 +77,28 @@ final class AutoIDProcess
     private function indexStructures(): void
     {
         $data = [];
+
         foreach ($this->object->blueprint()->fields() as $field) {
-            if (A::get($field, 'type') !== 'structure') {
-                continue;
-            }
-            $fieldname = A::get($field, 'name');
-            if (! $fieldname) {
-                continue;
-            }
-            $field = $this->object->{$fieldname}();
-            if ($field->isEmpty()) {
-                continue;
-            }
             try {
+                if (A::get($field, 'type') !== 'structure') {
+                    continue;
+                }
+                $fieldname = A::get($field, 'name');
+                if (! $fieldname) {
+                    continue;
+                }
+                $field = $this->object->{$fieldname}();
+                if ($field->isEmpty()) {
+                    continue;
+                }
+
                 $yaml = Yaml::decode($field->value());
                 $yaml = $this->indexArray($yaml, [$fieldname]);
                 $data[$fieldname] = Yaml::encode($yaml);
             } catch (Exception $exception) {
             }
         }
+
         $this->update = array_merge($this->update, $data);
     }
 
@@ -163,6 +166,8 @@ final class AutoIDProcess
             $data = $this->itemFromStructureObject($this->object, $tree);
         } elseif (is_a($this->object, Page::class)) {
             $data = $this->itemFromPage($this->object);
+        } elseif (is_a($this->object, Site::class)) {
+            $data = $this->itemFromSite($this->object);
         } elseif (is_a($this->object, File::class)) {
             $data = $this->itemFromFile($this->object);
         }
@@ -179,6 +184,16 @@ final class AutoIDProcess
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_PAGE,
             'template' => (string) $object->intendedTemplate(),
+        ];
+    }
+
+    private function itemFromSite($object): array
+    {
+        return [
+            'page' => '$',
+            'modified' => $object->modified(),
+            'kind' => AutoIDItem::KIND_PAGE,
+            'template' => 'site',
         ];
     }
 
