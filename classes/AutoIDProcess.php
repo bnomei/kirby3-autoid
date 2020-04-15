@@ -191,7 +191,7 @@ final class AutoIDProcess
     {
         return [
             'page' => '$',
-            'modified' => $object->modified(),
+            'modified' => filemtime($object->contentFile()), // just site not ALL
             'kind' => AutoIDItem::KIND_PAGE,
             'template' => 'site',
         ];
