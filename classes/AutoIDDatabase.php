@@ -94,6 +94,14 @@ final class AutoIDDatabase
         return null;
     }
 
+    public function findByDiruri(string $objectid): ?AutoIDItem
+    {
+        foreach ($this->database->query("SELECT * FROM AUTOID WHERE diruri = '${objectid}'") as $obj) {
+            return new AutoIDItem($obj);
+        }
+        return null;
+    }
+
     public function findByTemplate(string $template, string $rootId = ''): Collection
     {
         $rootId = ltrim($rootId, '/');

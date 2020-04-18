@@ -32,31 +32,33 @@ final class AutoID
         return null;
     }
 
+    private static $didIndexOnce;
     public static function index(bool $force = false, ?Page $root = null): int
     {
+        if (static::$didIndexOnce) {
+            return static::$didIndexOnce;
+        }
         $timeout = intval(\option('bnomei.autoid.index.timeout'));
         $indexed = 0;
-        if (AutoIDDatabase::singleton()->count() === 0 || $force) {
-            $break = time() + $timeout;
-
-            // site
-            if (self::push(site())) {
-                $indexed++;
-            }
-            if (! $root) {
-                $root = site();
-            }
-            if ($root->hasChildren()) {
-                foreach ($root->children()->index() as $page) {
-                    if (self::push($page)) {
-                        $indexed++;
-                    }
-                    if (!$force && time() >= $break) {
-                        break;
-                    }
+        $indexKey = $root ? $root->id() : 'site';
+        $indexing = kirby()->cache('bnomei.autoid')->get($indexKey, false);
+        if ($force || $indexing || AutoIDDatabase::singleton()->count() === 0) {
+            kirby()->cache('bnomei.autoid')->set($indexKey, true);
+            $break = time() + 2; //$timeout;
+            $indexer = new AutoIDIndexer($root);
+            foreach ($indexer->next() as $page) {
+                if (self::push($page)) {
+                    $indexed++;
+                }
+                if (!$force && time() >= $break) {
+                    $break = true;
+                    break;
                 }
             }
+            // if break then is still indexing
+            kirby()->cache('bnomei.autoid')->set($indexKey, $break === true);
         }
+        static::$didIndexOnce = $indexed;
         return $indexed;
     }
 
@@ -91,6 +93,8 @@ final class AutoID
 
     public static function flush(): void
     {
+        static::$didIndexOnce = null;
+        kirby()->cache('bnomei.autoid')->set('site', false);
         AutoIDDatabase::singleton()->flush();
     }
 

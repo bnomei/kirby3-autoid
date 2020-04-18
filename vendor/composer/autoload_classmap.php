@@ -9,6 +9,7 @@ return array(
     'Bnomei\\AutoID' => $baseDir . '/classes/AutoID.php',
     'Bnomei\\AutoIDDatabase' => $baseDir . '/classes/AutoIDDatabase.php',
     'Bnomei\\AutoIDGenerator' => $baseDir . '/classes/AutoIDGenerator.php',
+    'Bnomei\\AutoIDIndexer' => $baseDir . '/classes/AutoIDIndexer.php',
     'Bnomei\\AutoIDItem' => $baseDir . '/classes/AutoIDItem.php',
     'Bnomei\\AutoIDProcess' => $baseDir . '/classes/AutoIDProcess.php',
     'Bnomei\\IncrementingGenerator' => $baseDir . '/classes/IncrementingGenerator.php',

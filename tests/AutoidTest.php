@@ -126,11 +126,21 @@ final class AutoidTest extends TestCase
             AutoIDDatabase::singleton()->count() > 0
         );
     }
+    public function testIndexForced()
+    {
+        AutoID::flush();
+        $all = AutoID::index(true); // all
+
+        $count = AutoID::index(); // none left
+        $this->assertTrue(
+            $count === $all
+        );
+    }
 
     public function testModified()
     {
-        AutoID::flush();
-        AutoID::index();
+//        AutoID::flush();
+//        AutoID::index(true);
 
         $page = $this->randomPage();
 
@@ -164,7 +174,7 @@ final class AutoidTest extends TestCase
 
     public function testFindByID()
     {
-        AutoID::index(true);
+//        AutoID::index(true);
 
         /* @var $page Page */
         $page = $this->randomPage();
@@ -272,7 +282,7 @@ final class AutoidTest extends TestCase
 
     public function testSite()
     {
-        AutoID::index(true);
+//        AutoID::index(true);
 
         $taxonomies = site()->taxonomy()->yaml();
         $randIdx = rand(0, count($taxonomies)-1);
@@ -288,6 +298,9 @@ final class AutoidTest extends TestCase
 
     public function testChangeSlugOfPage()
     {
+//        AutoID::flush();
+//        AutoID::index(true);
+
         $randomPage = $this->randomPage();
         $autoid = $randomPage->autoid()->value();
         $oldSlug = $randomPage->slug();
@@ -301,6 +314,9 @@ final class AutoidTest extends TestCase
 
         // revert
         $updatedPage->changeSlug($oldSlug);
+
+        AutoID::flush();
+        AutoID::index(true);
     }
 
     public function testChangeSlugWillRedindexChildren()
@@ -316,6 +332,7 @@ final class AutoidTest extends TestCase
             }
         }
         $randomPageChild = $randomPage->children()->first();
+        $randomPageChildSlug = $randomPageChild->slug();
         $randomPageChildAutoid = $randomPageChild->autoid()->value();
 
         $newSlug = md5((string) time());
@@ -323,25 +340,32 @@ final class AutoidTest extends TestCase
 
         kirby()->impersonate('kirby');
         $randomPage = $randomPage->changeSlug($newSlug);
+        $randomPageChild = $randomPage->children()->filter(function($child) use ($randomPageChildSlug) {
+            return $child->slug() === $randomPageChildSlug;
+        })->first();
 
         $randomPageFound = \autoid($randomPage->autoid()->value());
         $this->assertNotNull($randomPageFound);
 
         $randomPageChildFound = \autoid($randomPageChildAutoid);
         $this->assertNotNull($randomPageChildFound);
+
         $this->assertStringContainsString(
-            $randomPage->diruri(),
-            $randomPageChildFound->diruri()
+            $randomPageFound->diruri(),
+            $randomPageChild->diruri()
         );
 
         // revert
         $randomPageFound->changeSlug($oldSlug);
+
+        AutoID::flush();
+        AutoID::index(true);
     }
 
     public function testFindByTemplate()
     {
-        // AutoID::flush();
-        AutoID::index(true);
+//        AutoID::flush();
+//        AutoID::index(true);
 
         $randomPage = $this->randomPage();
         $collection = AutoIDDatabase::singleton()->findByTemplate(

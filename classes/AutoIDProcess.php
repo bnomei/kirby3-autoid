@@ -35,9 +35,25 @@ final class AutoIDProcess
         $this->update = [];
         $this->autoids = [];
 
-        $this->indexPageOrFile();
-        $this->indexStructures();
-        $this->update();
+        if (! $this->overwrite) {
+            // skip without reading the autoid from content file
+            $diruri = null;
+            if(is_a($object, Page::class)) {
+                $diruri = $this->object->diruri();
+            } elseif(is_a($object, File::class)) {
+                $diruri = $this->object->parent()->diruri() . '@' . $this->object->filename();
+            } elseif(is_a($object, Site::class)) {
+                $diruri = '$';
+            }
+
+            $this->indexed = AutoIDDatabase::singleton()->findByDiruri($diruri) !== null;
+        }
+
+        if (! $this->indexed) {
+            $this->indexPageOrFile();
+            $this->indexStructures();
+            $this->update();
+        }
     }
 
     public function isIndexed(): bool

@@ -61,6 +61,7 @@ class ComposerStaticInit6b673b423e0df2df386679d23f5ba882
         'Bnomei\\AutoID' => __DIR__ . '/../..' . '/classes/AutoID.php',
         'Bnomei\\AutoIDDatabase' => __DIR__ . '/../..' . '/classes/AutoIDDatabase.php',
         'Bnomei\\AutoIDGenerator' => __DIR__ . '/../..' . '/classes/AutoIDGenerator.php',
+        'Bnomei\\AutoIDIndexer' => __DIR__ . '/../..' . '/classes/AutoIDIndexer.php',
         'Bnomei\\AutoIDItem' => __DIR__ . '/../..' . '/classes/AutoIDItem.php',
         'Bnomei\\AutoIDProcess' => __DIR__ . '/../..' . '/classes/AutoIDProcess.php',
         'Bnomei\\IncrementingGenerator' => __DIR__ . '/../..' . '/classes/IncrementingGenerator.php',
