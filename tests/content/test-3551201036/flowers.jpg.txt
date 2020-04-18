@@ -1,5 +1,0 @@
-Autoid: vev36io9
-
-----
-
-Template: autoidimage

@@ -1,5 +1,0 @@
-Autoid: 6t1xub7f
-
-----
-
-Template: autoidimage
