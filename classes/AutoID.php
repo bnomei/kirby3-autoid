@@ -44,7 +44,7 @@ final class AutoID
         $indexing = kirby()->cache('bnomei.autoid')->get($indexKey, false);
         if ($force || $indexing || AutoIDDatabase::singleton()->count() === 0) {
             kirby()->cache('bnomei.autoid')->set($indexKey, true);
-            $break = time() + 2; //$timeout;
+            $break = time() + $timeout;
             $indexer = new AutoIDIndexer($root);
             foreach ($indexer->next() as $page) {
                 if (self::push($page)) {
