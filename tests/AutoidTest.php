@@ -70,7 +70,11 @@ final class AutoidTest extends TestCase
             'source' => $this->filepath,
             'template' => 'autoidimage'
         ]);
-        $page = $page->changeStatus('unlisted');
+        if ($depth % 2 === 0) {
+            $page = $page->changeStatus('unlisted');
+        } else {
+            $page = $page->changeStatus('listed');
+        }
         if ($depth > 0) {
             $depth--;
             for ($i = 0; $i < $depth; $i++) {
@@ -164,8 +168,6 @@ final class AutoidTest extends TestCase
 
         /* @var $page Page */
         $page = $this->randomPage();
-        var_dump($page->id());
-        var_dump(AutoID::findByID($page->id()));
 
         $this->assertTrue(
             AutoID::findByID($page->id()) === $page
@@ -299,6 +301,41 @@ final class AutoidTest extends TestCase
 
         // revert
         $updatedPage->changeSlug($oldSlug);
+    }
+
+    public function testChangeSlugWillRedindexChildren()
+    {
+//        AutoID::flush();
+//        AutoID::index(true);
+
+        $randomPage = null;
+        while (! $randomPage ) {
+            $p = $this->randomPage();
+            if ($p->hasChildren()) {
+                $randomPage = $p;
+            }
+        }
+        $randomPageChild = $randomPage->children()->first();
+        $randomPageChildAutoid = $randomPageChild->autoid()->value();
+
+        $newSlug = md5((string) time());
+        $oldSlug = $randomPage->slug();
+
+        kirby()->impersonate('kirby');
+        $randomPage = $randomPage->changeSlug($newSlug);
+
+        $randomPageFound = \autoid($randomPage->autoid()->value());
+        $this->assertNotNull($randomPageFound);
+
+        $randomPageChildFound = \autoid($randomPageChildAutoid);
+        $this->assertNotNull($randomPageChildFound);
+        $this->assertStringContainsString(
+            $randomPage->diruri(),
+            $randomPageChildFound->diruri()
+        );
+
+        // revert
+        $randomPageFound->changeSlug($oldSlug);
     }
 
     public function testFindByTemplate()

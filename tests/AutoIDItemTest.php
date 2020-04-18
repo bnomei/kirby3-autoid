@@ -18,6 +18,7 @@ final class AutoIDItemTest extends TestCase
             'autoid' => '123456',
             'modified' => time(),
             'page' => 'home',
+            'diruri' => 'home',
             'kind' => AutoIDItem::KIND_PAGE,
         ]);
 
@@ -25,6 +26,7 @@ final class AutoIDItemTest extends TestCase
             'autoid' => '123456',
             'modified' => time(),
             'page' => 'home',
+            'diruri' => 'home@flowers.jpg',
             'filename' => 'flowers.jpg',
             'kind' => AutoIDItem::KIND_FILE,
         ]);
@@ -33,6 +35,7 @@ final class AutoIDItemTest extends TestCase
             'autoid' => '123456',
             'modified' => time(),
             'page' => 'home',
+            'diruri' => 'home@flowersNOPE.jpg',
             'filename' => 'flowersNOPE.jpg',
             'kind' => AutoIDItem::KIND_FILE,
         ]);

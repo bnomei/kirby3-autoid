@@ -32,23 +32,28 @@ final class AutoID
         return null;
     }
 
-    public static function index(bool $force = false): int
+    public static function index(bool $force = false, ?Page $root = null): int
     {
+        $timeout = intval(\option('bnomei.autoid.index.timeout'));
         $indexed = 0;
         if (AutoIDDatabase::singleton()->count() === 0 || $force) {
-            $break = time() + 20;
+            $break = time() + $timeout;
 
             // site
             if (self::push(site())) {
                 $indexed++;
             }
-            // all but drafts
-            foreach (site()->pages()->index() as $page) {
-                if (self::push($page)) {
-                    $indexed++;
-                }
-                if (!$force && time() >= $break) {
-                    break;
+            if (! $root) {
+                $root = site();
+            }
+            if ($root->hasChildren()) {
+                foreach ($root->children()->index() as $page) {
+                    if (self::push($page)) {
+                        $indexed++;
+                    }
+                    if (!$force && time() >= $break) {
+                        break;
+                    }
                 }
             }
         }
@@ -64,15 +69,22 @@ final class AutoID
         return $process->isIndexed();
     }
 
-    public static function remove($object): void
+    public static function remove($object, bool $recursive = false): void
     {
         if (is_string($object)) {
+            $item = AutoIDDatabase::singleton()->find($object);
+            $object = $item->page();
             AutoIDDatabase::singleton()->delete($object);
         }
 
-        if (is_a($object, Page::class) ||
-            is_a($object, File::class)
-        ) {
+        if (is_a($object, Page::class)) {
+            AutoIDDatabase::singleton()->deleteByID($object->id());
+            if ($recursive) {
+                AutoIDDatabase::singleton()->deleteByDiruri($object->diruri());
+            }
+        }
+
+        if (is_a($object, File::class)) {
             AutoIDDatabase::singleton()->deleteByID($object->id());
         }
     }

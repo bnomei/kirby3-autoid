@@ -30,8 +30,8 @@ final class AutoIDDatabase
     public function __construct(array $options = [])
     {
         $this->options = array_merge([
-            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-4-9.sqlite',
-            'target' => self::cacheFolder() . '/autoid-v2-4-9.sqlite',
+            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-6-0.sqlite',
+            'target' => self::cacheFolder() . '/autoid-v2-6-0.sqlite',
         ], $options);
 
         $target = $this->options['target'];
@@ -160,9 +160,9 @@ final class AutoIDDatabase
         // enter a new single entry
         $this->database->query("
             INSERT INTO AUTOID
-            (autoid, modified, page, filename, structure, kind, template)
+            (autoid, modified, page, filename, structure, kind, template, diruri)
             VALUES
-            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}')
+            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}', '{$item->diruri}')
         ");
         $this->count = null;
     }
@@ -184,6 +184,17 @@ final class AutoIDDatabase
         }
 
         $this->database->query("DELETE FROM AUTOID WHERE autoid = '${autoid}'");
+        $this->count = null;
+    }
+
+    public function deleteByDiruri($objectid): void
+    {
+        if (is_a($objectid, Field::class)) {
+            $objectid = (string) $objectid->value();
+        }
+
+        $str = "DELETE FROM AUTOID WHERE diruri LIKE '${objectid}%'";
+        $this->database->query($str);
         $this->count = null;
     }
 

@@ -43,15 +43,21 @@ final class AutoIDItem
      */
     public function page()
     {
-        $id = $this->data->page;
-        return $id === '$' ? site() : $this->findPage($this->data->page);
+        $page = $this->data->page;
+        return $page === '$' ? site() : $this->findPage($page, $this->data->diruri);
     }
 
-    private function findPage(string $id): ?Page
+    private function findPage(string $id, string $diruri): ?Page
     {
         $page = null;
         if (function_exists('bolt')) {
-            $page = \bolt($id);
+            // remove file and structure suffix
+            $diruri = explode('@', $diruri)[0];
+            $diruri = explode('#', $diruri)[0];
+            $page = \bolt($diruri); // fastest
+            if (! $page) {
+                $page = \bolt($id); // fast
+            }
         }
         return $page ? $page : page($id);
     }

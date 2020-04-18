@@ -181,6 +181,7 @@ final class AutoIDProcess
     {
         return [
             'page' => $object->id(),
+            'diruri' => $object->diruri(),
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_PAGE,
             'template' => (string) $object->intendedTemplate(),
@@ -191,6 +192,7 @@ final class AutoIDProcess
     {
         return [
             'page' => '$',
+            'diruri' => '$',
             'modified' => filemtime($object->contentFile()), // just site not ALL
             'kind' => AutoIDItem::KIND_PAGE,
             'template' => 'site',
@@ -201,6 +203,7 @@ final class AutoIDProcess
     {
         return [
             'page' => $object->page()->id(),
+            'diruri' => $object->page()->diruri() . '@' . $object->filename(),
             'filename' => $object->filename(),
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_FILE,
@@ -210,10 +213,17 @@ final class AutoIDProcess
 
     private function itemFromStructureObject($object, array $tree): array
     {
+        $id = is_a($this->object, Site::class) ? '$' : $object->id();
+        $diruri = is_a($this->object, Site::class) ? '$' : $object->diruri();
+        $treeFlat = implode(',', $tree);
+        $modified = is_a($this->object, Site::class) ?
+            filemtime($object->contentFile()) :
+            $object->modified();
         return [
-            'page' => is_a($this->object, Site::class) ? '$' : $object->id(),
-            'modified' => $object->modified(),
-            'structure' => implode(',', $tree),
+            'page' => $id,
+            'diruri' => $diruri . '#' . $treeFlat,
+            'modified' => $modified,
+            'structure' => $treeFlat,
             'kind' => AutoIDItem::KIND_STRUCTUREOBJECT,
             'template' => 'structureobject',
         ];

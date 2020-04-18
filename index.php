@@ -50,6 +50,7 @@ if (! function_exists('autoid')) {
 Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
+        'index.timeout' => 20, // sec
         'generator' => function (?string $seed = null) {
             // override with custom callback if needed
             return (new \Bnomei\TokenGenerator($seed))->generate();
@@ -156,16 +157,19 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::push($newPage, true);
         },
         'page.changeNum:after' => function ($newPage, $oldPage) {
-            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::remove($oldPage, true);
             \Bnomei\AutoID::push($newPage);
+            \Bnomei\AutoID::index(true, $newPage);
         },
         'page.changeSlug:after' => function ($newPage, $oldPage) {
-            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::remove($oldPage, true);
             \Bnomei\AutoID::push($newPage);
+            \Bnomei\AutoID::index(true, $newPage);
         },
         'page.changeStatus:after' => function ($newPage, $oldPage) {
-            \Bnomei\AutoID::remove($oldPage);
+            \Bnomei\AutoID::remove($oldPage, true);
             \Bnomei\AutoID::push($newPage);
+            \Bnomei\AutoID::index(true, $newPage);
         },
         'page.changeTemplate:after' => function ($newPage, $oldPage) {
             \Bnomei\AutoID::remove($oldPage);
