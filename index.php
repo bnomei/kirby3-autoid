@@ -51,7 +51,7 @@ Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
         'index.timeout' => 20, // sec
-        'generator' => function (?string $seed = null) {
+        'generator.fn' => function (?string $seed = null) {
             // override with custom callback if needed
             return (new \Bnomei\TokenGenerator($seed))->generate();
             // return (new \Bnomei\IncrementingGenerator(0))->generate();
@@ -153,8 +153,8 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::remove($oldPage);
             \Bnomei\AutoID::push($newPage);
         },
-        'page.duplicate:after' => function ($newPage) {
-            \Bnomei\AutoID::push($newPage, true);
+        'page.duplicate:after' => function ($duplicatePage) {
+            \Bnomei\AutoID::push($duplicatePage, true);
         },
         'page.changeNum:after' => function ($newPage, $oldPage) {
             \Bnomei\AutoID::remove($oldPage, true);
@@ -179,7 +179,7 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::remove($oldPage);
             \Bnomei\AutoID::push($newPage);
         },
-        'page.delete:before' => function ($page) {
+        'page.delete:before' => function ($page, $force) {
             \Bnomei\AutoID::remove($page);
         },
         'file.create:after' => function ($file) {

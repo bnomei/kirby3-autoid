@@ -117,13 +117,17 @@ final class AutoidTest extends TestCase
     public function testIndex()
     {
         AutoID::flush();
-        $count = AutoID::index();
+        $count = AutoID::index(true);
 
         $this->assertTrue(
             $count > 0
         );
         $this->assertTrue(
             AutoIDDatabase::singleton()->count() > 0
+        );
+        $this->assertEquals(
+            site()->index()->count() + 1, // + site
+            $count
         );
     }
     public function testIndexForced()
@@ -174,7 +178,7 @@ final class AutoidTest extends TestCase
 
     public function testFindByID()
     {
-//        AutoID::index(true);
+        // AutoID::index(true);
 
         /* @var $page Page */
         $page = $this->randomPage();
@@ -202,6 +206,10 @@ final class AutoidTest extends TestCase
             \autoid($file) === $file
         );
 
+    }
+
+    public function testFindByIDUnused()
+    {
         $unusedID = \autoid();
         $this->assertTrue(
             AutoID::find($unusedID) === null
