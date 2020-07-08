@@ -51,14 +51,14 @@ Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
         'index.timeout' => 20, // sec
-        'generator.fn' => function (?string $seed = null) {
+        'generator' => function (?string $seed = null) {
             // override with custom callback if needed
             return (new \Bnomei\TokenGenerator($seed))->generate();
             // return (new \Bnomei\IncrementingGenerator(0))->generate();
             // return (new \Bnomei\NanoGenerator())->generate();
             // return (new \Bnomei\UUIDGenerator(site()->url()))->generate();
         },
-        'generator.break' => 42, // generator loops for uniqueness
+        'generator-break' => 42, // generator loops for uniqueness
         'tinyurl.url' => function () {
             return kirby()->url('index');
         },

@@ -18,9 +18,9 @@ final class AutoID
 
     public static function generate(): ?string
     {
-        $generator = option('bnomei.autoid.generator.fn');
+        $generator = option('bnomei.autoid.generator');
         if (is_callable($generator)) {
-            $break = intval(option('bnomei.autoid.generator.break'));
+            $break = intval(option('bnomei.autoid.generator-break'));
             while ($break > 0) {
                 $break--;
                 $newid = $generator();
