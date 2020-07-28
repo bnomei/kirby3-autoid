@@ -31,7 +31,7 @@ jobs:
       # update kirby to latest release of version 3 (includes release candidates!)
       # https://semver.mwl.be/#!?package=getkirby%2Fcms&version=3.*&minimum-stability=RC
       - name: Update Kirby Core
-        run: composer require getkirby/cms:"3.*@RC --working-dir=tests/kirby"
+        run: composer require getkirby/cms:"3.*@RC" --working-dir=tests/kirby
 
       - name: Run Tests
         run: composer test
