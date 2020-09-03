@@ -37,7 +37,7 @@ if (! function_exists('autoid')) {
 
     function modified($autoid): ?int
     {
-        \Bnomei\AutoID::index();
+        // \Bnomei\AutoID::index(); // might cause recursion
         return \Bnomei\AutoID::modified($autoid);
     }
 
