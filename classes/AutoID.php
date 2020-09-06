@@ -158,23 +158,23 @@ final class AutoID
             return $autoid->modified();
         }
 
+        if(is_a($autoid,  \Kirby\Cms\Site::class)){
+            // site->modified() would be ALL content files
+            return filemtime(site()->contentFile());
+        }
+
         if (is_a($autoid, Page::class) ||
             is_a($autoid, File::class) ||
             is_a($autoid, FileVersion::class)) {
-
+            /*
             // try finding without reading the file
             $item = AutoIDDatabase::singleton()->findByID($autoid->id());
             if ($item) {
                 return $item->modified();
             }
-            // if fails do not index the object but just check
-            // the file timestamp since that is the fastest thing to do
-            /*
-            if ($autoid->{AutoID::FIELDNAME}()->isNotEmpty()) {
-                // make sure it exists using AUTOID (in caps)
-                return self::modified($autoid->AUTOID());
-            }
             */
+            // use the file timestamp since that is the fastest thing to do
+            // in kirby when a the object exists
             return $autoid->modified();
         }
 
