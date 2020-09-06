@@ -41,9 +41,17 @@ final class AutoID
         $timeout = intval(\option('bnomei.autoid.index.timeout'));
         $indexed = 0;
         $indexKey = $root ? $root->id() : 'site';
-        $indexing = kirby()->cache('bnomei.autoid')->get($indexKey, false);
-        if ($force || $indexing || AutoIDDatabase::singleton()->count() === 0) {
-            kirby()->cache('bnomei.autoid')->set($indexKey, true);
+        $indexRetries = intval(\option('bnomei.autoid.index.retries'));
+        $indexing = kirby()->cache('bnomei.autoid')->get($indexKey, $indexRetries);
+        if ($indexing === true) {
+            $indexing = 1;
+        } elseif ($indexing === false) {
+            $indexing = 0;
+        }
+        if ($force) {
+            $indexing = $indexRetries;
+        }
+        if ($indexing > 0 || AutoIDDatabase::singleton()->count() === 0) {
             $break = time() + $timeout;
             $indexer = new AutoIDIndexer($root);
             foreach ($indexer->next() as $page) {
@@ -55,8 +63,15 @@ final class AutoID
                     break;
                 }
             }
+            if ($break === true) {
+                $indexing--; // retry
+            } else {
+                $indexing = 0; // done
+            }
             // if break then is still indexing
-            kirby()->cache('bnomei.autoid')->set($indexKey, $break === true);
+            kirby()->cache('bnomei.autoid')->set($indexKey, $indexing);
+        } else {
+            kirby()->cache('bnomei.autoid')->set($indexKey, 0);
         }
         static::$didIndexOnce = $indexed;
         return $indexed;
@@ -94,7 +109,10 @@ final class AutoID
     public static function flush(): void
     {
         static::$didIndexOnce = null;
-        kirby()->cache('bnomei.autoid')->set('site', false);
+        kirby()->cache('bnomei.autoid')->set(
+            'site',
+            intval(\option('bnomei.autoid.index.retries'))
+        );
         AutoIDDatabase::singleton()->flush();
     }
 
@@ -158,23 +176,23 @@ final class AutoID
             return $autoid->modified();
         }
 
-        if(is_a($autoid,  \Kirby\Cms\Site::class)){
-            // site->modified() would be ALL content files
-            return filemtime(site()->contentFile());
-        }
-
         if (is_a($autoid, Page::class) ||
             is_a($autoid, File::class) ||
             is_a($autoid, FileVersion::class)) {
-            /*
+
             // try finding without reading the file
             $item = AutoIDDatabase::singleton()->findByID($autoid->id());
             if ($item) {
                 return $item->modified();
             }
+            // if fails do not index the object but just check
+            // the file timestamp since that is the fastest thing to do
+            /*
+            if ($autoid->{AutoID::FIELDNAME}()->isNotEmpty()) {
+                // make sure it exists using AUTOID (in caps)
+                return self::modified($autoid->AUTOID());
+            }
             */
-            // use the file timestamp since that is the fastest thing to do
-            // in kirby when a the object exists
             return $autoid->modified();
         }
 

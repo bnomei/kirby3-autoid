@@ -51,6 +51,7 @@ Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
         'index.timeout' => 20, // sec
+        'index.retries' => 5, // times
         'generator' => function (?string $seed = null) {
             // override with custom callback if needed
             return (new \Bnomei\TokenGenerator($seed))->generate();
