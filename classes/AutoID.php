@@ -54,6 +54,7 @@ final class AutoID
         if ($indexing > 0 || AutoIDDatabase::singleton()->count() === 0) {
             $break = time() + $timeout;
             $indexer = new AutoIDIndexer($root);
+            AutoIDDatabase::singleton()->database()->execute('BEGIN TRANSACTION;');
             foreach ($indexer->next() as $page) {
                 if (self::push($page)) {
                     $indexed++;
@@ -63,6 +64,7 @@ final class AutoID
                     break;
                 }
             }
+            AutoIDDatabase::singleton()->database()->execute('END TRANSACTION;');
             if ($break === true) {
                 $indexing--; // retry
             } else {
