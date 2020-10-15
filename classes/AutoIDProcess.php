@@ -218,8 +218,8 @@ final class AutoIDProcess
     private function itemFromFile($object): array
     {
         return [
-            'page' => $object->page()->id(),
-            'diruri' => $object->page()->diruri() . '@' . $object->filename(),
+            'page' => $object->parent()->id(),
+            'diruri' => $object->parent()->diruri() . '@' . $object->filename(),
             'filename' => $object->filename(),
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_FILE,
