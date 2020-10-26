@@ -266,9 +266,15 @@ final class AutoidTest extends TestCase
     public function testDuplicate()
     {
         kirby()->impersonate('kirby');
-        $page = $this->randomPage();
-//        $autoid = $page->autoid()->value();
-        $dup = $page->duplicate('test-duplicate');
+
+        // find page with subpages
+        $page = null;
+        while(!$page || $page->index()->count() === 0) {
+            $page = $this->randomPage();
+        }
+        // $autoid = $page->autoid()->value();
+        // and copy its children as well
+        $dup = $page->duplicate('test-duplicate', ['children' => true]);
         // will trigger duplicate:after hook
         // but call again for testing
         AutoID::push($dup, true);
