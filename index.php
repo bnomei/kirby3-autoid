@@ -154,9 +154,9 @@ Kirby::plugin('bnomei/autoid', [
             \Bnomei\AutoID::remove($oldPage);
             \Bnomei\AutoID::push($newPage);
         },
-        'page.duplicate:after' => function ($duplicatePage) {
+        'page.duplicate:after' => function ($duplicatePage, $originalPage) {
             \Bnomei\AutoID::push($duplicatePage, true);
-            foreach($duplicatePage->index() as $newPage) {
+            foreach($duplicatePage->index(true) as $newPage) {
                 \Bnomei\AutoID::push($newPage, true);
             }
         },
