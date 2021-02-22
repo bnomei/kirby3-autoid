@@ -1,0 +1,14 @@
+/docs               export-ignore
+/tests              export-ignore
+/.github            export-ignore
+/.gitattributes     export-ignore
+/.coveralls.yml     export-ignore
+/.php_cs.dist       export-ignore
+/.gitignore         export-ignore
+/.travis.yml        export-ignore
+/phpunit.xml        export-ignore
+
+/autoid-v2-1-0.sqlite export-ignore
+/autoid-v2-3-0.sqlite export-ignore
+/autoid-v2-4-9.sqlite export-ignore
+/autoid-v2-6-0.sqlite export-ignore
