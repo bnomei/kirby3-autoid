@@ -13,12 +13,12 @@ class AutoIDProcessTest extends TestCase
 {
     public function randomPage(): ?Page
     {
-        return site()->pages()->index()->notTemplate('home')->shuffle()->first();
+        return site()->pages()->index(true)->notTemplate('home')->shuffle()->first();
     }
 
     public function randomFile(): ?File
     {
-        return site()->pages()->index()->notTemplate('home')->files()->shuffle()->first();
+        return site()->pages()->index(true)->notTemplate('home')->files()->shuffle()->first();
     }
 
     public function testProcessPage()

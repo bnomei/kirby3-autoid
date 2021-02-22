@@ -31,7 +31,7 @@ final class AutoIDDatabase
     {
         $this->options = array_merge([
             'template' => realpath(__DIR__ . '/../') . '/autoid-v2-6-0.sqlite',
-            'target' => self::cacheFolder() . '/autoid-v2-6-0.sqlite',
+            'target' => self::cacheFolder() . '/autoid-v2-8-0.sqlite',
         ], $options);
 
         $target = $this->options['target'];
@@ -55,14 +55,14 @@ final class AutoIDDatabase
         return $this->database;
     }
 
-    public function count(): int
+    public function countPages(): int
     {
         if (! is_null($this->count)) {
             // fastest
             return $this->count;
         }
         // faster
-        $this->count = intval($this->database->query('SELECT count(*) as count FROM AUTOID')->first()->count);
+        $this->count = intval($this->database->query('SELECT count(*) as count FROM AUTOID WHERE kind == \'Page\'')->first()->count);
         return $this->count;
         // slow
         // return count($this->database->query('SELECT rowid FROM AUTOID'));
@@ -168,9 +168,9 @@ final class AutoIDDatabase
         // enter a new single entry
         $this->database->query("
             INSERT INTO AUTOID
-            (autoid, modified, page, filename, structure, kind, template, diruri)
+            (autoid, modified, page, filename, structure, kind, template, diruri, draft)
             VALUES
-            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}', '{$item->diruri}')
+            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}', '{$item->diruri}', '{$item->draft}')
         ");
         $this->count = null;
     }

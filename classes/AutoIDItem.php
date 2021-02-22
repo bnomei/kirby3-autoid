@@ -59,7 +59,7 @@ final class AutoIDItem
                 $page = \bolt($id); // fast
             }
         }
-        return $page ? $page : page($id);
+        return $page ? $page : AutoID::pageAndDrafts($id);
     }
 
     public function file(): ?File
@@ -93,6 +93,11 @@ final class AutoIDItem
     public function isPage(): bool
     {
         return $this->data->kind === self::KIND_PAGE;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->data->draft === 1;
     }
 
     public function isFile(): bool

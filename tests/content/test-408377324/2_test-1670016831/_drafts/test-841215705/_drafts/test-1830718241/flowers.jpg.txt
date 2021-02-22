@@ -1,0 +1,5 @@
+Autoid: be85d639
+
+----
+
+Template: autoidimage

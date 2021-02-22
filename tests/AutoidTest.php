@@ -27,7 +27,7 @@ final class AutoidTest extends TestCase
     {
         AutoID::flush();
 
-        $this->depth = 3;
+        $this->depth = 4;
 
         if (site()->pages()->children()->notTemplate('home')->count() === 0) {
             for ($i = 0; $i < $this->depth; $i++) {
@@ -75,6 +75,9 @@ final class AutoidTest extends TestCase
         } else {
             $page = $page->changeStatus('listed');
         }
+        if ($idx === 0) {
+            $page = $page->changeStatus('draft');
+        }
         if ($depth > 0) {
             $depth--;
             for ($i = 0; $i < $depth; $i++) {
@@ -87,19 +90,19 @@ final class AutoidTest extends TestCase
 
     public function randomPage(): ?Page
     {
-        return site()->pages()->index()->notTemplate('home')->shuffle()->first();
+        return site()->pages()->index(true)->notTemplate('home')->shuffle()->first();
     }
 
     public function randomFile(): ?File
     {
-        return site()->pages()->index()->notTemplate('home')->files()->shuffle()->first();
+        return site()->pages()->index(true)->notTemplate('home')->files()->shuffle()->first();
     }
 
     public function tearDownPages(): void
     {
         kirby()->impersonate('kirby');
         /* @var $page Page */
-        foreach (site()->pages()->index()->notTemplate('home') as $page) {
+        foreach (site()->pages()->index(true)->notTemplate('home') as $page) {
             $page->delete(true);
         }
         AutoID::flush();
@@ -110,7 +113,7 @@ final class AutoidTest extends TestCase
         AutoID::flush();
 
         $this->assertTrue(
-            AutoIDDatabase::singleton()->count() === 0
+            AutoIDDatabase::singleton()->countPages() === 0
         );
     }
 
@@ -123,13 +126,14 @@ final class AutoidTest extends TestCase
             $count > 0
         );
         $this->assertTrue(
-            AutoIDDatabase::singleton()->count() > 0
+            AutoIDDatabase::singleton()->countPages() > 0
         );
         $this->assertEquals(
-            site()->index()->count() + 1, // + site
+            site()->index(true)->count() + 1, // + site
             $count
         );
     }
+
     public function testIndexForced()
     {
         AutoID::flush();
@@ -163,7 +167,7 @@ final class AutoidTest extends TestCase
             ])
         );
 
-        $allCollection = site()->pages()->index()->notTemplate('home');
+        $allCollection = site()->pages()->index(true)->notTemplate('home');
         $maxModified = null;
         foreach ($allCollection as $pall) {
             if (!$maxModified || $maxModified < $pall->modified()) {
@@ -182,6 +186,7 @@ final class AutoidTest extends TestCase
 
         /* @var $page Page */
         $page = $this->randomPage();
+        var_dump($page->id());
 
         $this->assertTrue(
             AutoID::findByID($page->id()) === $page
@@ -269,7 +274,7 @@ final class AutoidTest extends TestCase
 
         // find page with subpages
         $page = null;
-        while(!$page || $page->index()->count() === 0) {
+        while(!$page || $page->index(true)->count() === 0) {
             $page = $this->randomPage();
         }
         // $autoid = $page->autoid()->value();
@@ -386,14 +391,14 @@ final class AutoidTest extends TestCase
             'autoidtest',
             $randomPage->id()
         );
-        $this->assertEquals($randomPage->index()->not($randomPage)->count(), $collection->count());
+        $this->assertEquals($randomPage->index(true)->not($randomPage)->count(), $collection->count());
 
         $randomPage = $this->randomPage();
         $collection = $randomPage->searchForTemplate('autoidtest');
-        $this->assertEquals($randomPage->index()->not($randomPage)->count(), $collection->count());
+        $this->assertEquals($randomPage->index(true)->not($randomPage)->count(), $collection->count());
 
         $collection = site()->searchForTemplate('autoidtest');
-        $this->assertEquals(site()->index()->notTemplate('home')->count(), $collection->count());
+        $this->assertEquals(site()->index(true)->notTemplate('home')->count(), $collection->count());
     }
 
     public function testCreateAndRetrieveAutoID()
@@ -435,5 +440,10 @@ final class AutoidTest extends TestCase
         $this->assertFileNotExists($dbfilePath);
         new AutoIDDatabase(); // create db
         $this->assertFileExists($dbfilePath);
+    }
+
+    public function testWorksWithDrafts()
+    {
+
     }
 }

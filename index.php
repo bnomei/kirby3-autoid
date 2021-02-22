@@ -50,6 +50,7 @@ if (! function_exists('autoid')) {
 Kirby::plugin('bnomei/autoid', [
     'options' => [
         'cache' => true,
+        'index.drafts' => false, // TODO: add to wiki
         'index.timeout' => 20, // sec
         'index.retries' => 5, // times
         'generator' => function (?string $seed = null) {

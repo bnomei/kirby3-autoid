@@ -10,6 +10,7 @@ use Kirby\Cms\FileVersion;
 use Kirby\Cms\Page;
 use Kirby\Cms\Site;
 use Kirby\Toolkit\Iterator;
+use Kirby\Toolkit\Str;
 
 final class AutoID
 {
@@ -51,7 +52,7 @@ final class AutoID
         if ($force) {
             $indexing = $indexRetries;
         }
-        if ($indexing > 0 || AutoIDDatabase::singleton()->count() === 0) {
+        if ($indexing > 0 || AutoIDDatabase::singleton()->countPages() === 0) {
             $break = time() + $timeout;
             $indexer = new AutoIDIndexer($root);
             AutoIDDatabase::singleton()->database()->execute('BEGIN TRANSACTION;');
@@ -131,11 +132,11 @@ final class AutoID
             $find = AutoIDDatabase::singleton()->findByID($autoid);
         }
         if(! $find) {
-            if($page = site()->index()->filterBy(self::FIELDNAME, $autoid)->first()) {
+            if($page = site()->index(true)->filterBy(self::FIELDNAME, $autoid)->first()) {
                 self::push($page);
                 return $page;
             }
-            if($file = site()->index()->files()->filterBy(self::FIELDNAME, $autoid)->first()) {
+            if($file = site()->index(true)->files()->filterBy(self::FIELDNAME, $autoid)->first()) {
                 self::push($file);
                 return $file;
             }
@@ -222,5 +223,23 @@ final class AutoID
             $url = rtrim($url, '/') . '/' . option('bnomei.autoid.tinyurl.folder');
         }
         return rtrim($url, '/') . '/' . $autoid;
+    }
+
+    public static function pageAndDrafts(string $id): ?\Kirby\Cms\Page
+    {
+        if (Str::contains($id, '_drafts')) {
+            // get page considering one (or more!) drafts in path
+            $page = null;
+            foreach(explode('/', $id) as $part) {
+                if ($part === '_drafts') {
+                    continue;
+                }
+                $page = $page ?
+                    $page->findPageOrDraft($part) :
+                    site()->findPageOrDraft($part);
+            }
+            return $page;
+        }
+        return page($id);
     }
 }

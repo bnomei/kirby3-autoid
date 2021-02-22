@@ -1,5 +1,0 @@
-Autoid: jg703ceu
-
-----
-
-Template: autoidimage

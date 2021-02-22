@@ -23,13 +23,23 @@ final class AutoIDIndexer
 
     public function next(): \Generator
     {
+        $indexDrafts = \option('bnomei.autoid.index.drafts');
         $next = $this->root;
         while($next) {
             yield $next;
-            foreach($next->children() as $child) {
-                $recursive = new self($child);
-                foreach ($recursive->next() as $item) {
-                    yield $item;
+            if ($indexDrafts) {
+                foreach($next->childrenAndDrafts() as $child) {
+                    $recursive = new self($child);
+                    foreach ($recursive->next() as $item) {
+                        yield $item;
+                    }
+                }
+            } else {
+                foreach($next->children() as $child) {
+                    $recursive = new self($child);
+                    foreach ($recursive->next() as $item) {
+                        yield $item;
+                    }
                 }
             }
             $next = null;

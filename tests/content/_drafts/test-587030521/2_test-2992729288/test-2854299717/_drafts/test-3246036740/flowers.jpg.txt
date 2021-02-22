@@ -1,0 +1,5 @@
+Autoid: ui2wim4d
+
+----
+
+Template: autoidimage

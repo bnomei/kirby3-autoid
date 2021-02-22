@@ -201,6 +201,7 @@ final class AutoIDProcess
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_PAGE,
             'template' => (string) $object->intendedTemplate(),
+            'draft' => $object->isDraft() ? 1 : 0,
         ];
     }
 
@@ -212,6 +213,7 @@ final class AutoIDProcess
             'modified' => filemtime($object->contentFile()), // just site not ALL
             'kind' => AutoIDItem::KIND_PAGE,
             'template' => 'site',
+            'draft' => null,
         ];
     }
 
@@ -224,6 +226,7 @@ final class AutoIDProcess
             'modified' => $object->modified(),
             'kind' => AutoIDItem::KIND_FILE,
             'template' => (string) $object->template(),
+            'draft' => null,
         ];
     }
 
@@ -242,6 +245,7 @@ final class AutoIDProcess
             'structure' => $treeFlat,
             'kind' => AutoIDItem::KIND_STRUCTUREOBJECT,
             'template' => 'structureobject',
+            'draft' => null,
         ];
     }
 }
