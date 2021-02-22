@@ -30,7 +30,7 @@ final class AutoIDDatabase
     public function __construct(array $options = [])
     {
         $this->options = array_merge([
-            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-6-0.sqlite',
+            'template' => realpath(__DIR__ . '/../') . '/autoid-v2-8-0.sqlite',
             'target' => self::cacheFolder() . '/autoid-v2-8-0.sqlite',
         ], $options);
 
@@ -166,11 +166,12 @@ final class AutoIDDatabase
         $this->delete($item->autoid());
 
         // enter a new single entry
+        $draft = $item->draft ?? 'NULL';
         $this->database->query("
             INSERT INTO AUTOID
             (autoid, modified, page, filename, structure, kind, template, diruri, draft)
             VALUES
-            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}', '{$item->diruri}', '{$item->draft}')
+            ('{$item->autoid}', {$item->modified}, '{$item->page}', '{$item->filename}', '{$item->structure}', '{$item->kind}', '{$item->template}', '{$item->diruri}', {$draft})
         ");
         $this->count = null;
     }

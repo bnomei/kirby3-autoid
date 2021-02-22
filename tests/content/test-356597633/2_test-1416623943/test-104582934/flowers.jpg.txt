@@ -1,5 +1,0 @@
-Autoid: b66gbtfv
-
-----
-
-Template: autoidimage

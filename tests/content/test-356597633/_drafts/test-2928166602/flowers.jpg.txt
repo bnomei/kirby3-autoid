@@ -1,5 +1,0 @@
-Autoid: elm504bn
-
-----
-
-Template: autoidimage

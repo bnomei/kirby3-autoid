@@ -153,6 +153,7 @@ final class AutoID
     {
         // self::index(); // NOTE: would cause loop
         $find = AutoIDDatabase::singleton()->findByID($objectid);
+
         return $find ? $find->toObject() : null;
     }
 
@@ -225,9 +226,9 @@ final class AutoID
         return rtrim($url, '/') . '/' . $autoid;
     }
 
-    public static function pageAndDrafts(string $id): ?\Kirby\Cms\Page
+    public static function pageAndDrafts(string $id, string $diruri): ?\Kirby\Cms\Page
     {
-        if (Str::contains($id, '_drafts')) {
+        if (Str::contains($diruri, '_drafts')) {
             // get page considering one (or more!) drafts in path
             $page = null;
             foreach(explode('/', $id) as $part) {

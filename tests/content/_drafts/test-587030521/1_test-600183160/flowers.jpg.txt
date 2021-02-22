@@ -1,5 +1,0 @@
-Autoid: 61fa4rf3
-
-----
-
-Template: autoidimage

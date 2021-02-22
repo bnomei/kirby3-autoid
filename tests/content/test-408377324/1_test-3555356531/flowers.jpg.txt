@@ -1,5 +1,0 @@
-Autoid: 6r2bbz5o
-
-----
-
-Template: autoidimage

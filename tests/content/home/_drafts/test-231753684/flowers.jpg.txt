@@ -1,5 +1,0 @@
-Autoid: thwcbd48
-
-----
-
-Template: autoidimage

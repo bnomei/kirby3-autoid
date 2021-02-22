@@ -1,0 +1,5 @@
+Autoid: ly2a3mac
+
+----
+
+Template: autoidimage

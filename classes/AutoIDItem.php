@@ -59,7 +59,7 @@ final class AutoIDItem
                 $page = \bolt($id); // fast
             }
         }
-        return $page ? $page : AutoID::pageAndDrafts($id);
+        return $page ? $page : AutoID::pageAndDrafts($id, $diruri);
     }
 
     public function file(): ?File
@@ -97,7 +97,7 @@ final class AutoIDItem
 
     public function isDraft(): bool
     {
-        return $this->data->draft === 1;
+        return intval($this->data->draft) === 1;
     }
 
     public function isFile(): bool

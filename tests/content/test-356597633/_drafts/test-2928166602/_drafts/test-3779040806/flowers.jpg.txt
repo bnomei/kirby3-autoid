@@ -1,5 +1,0 @@
-Autoid: 0xqxcils
-
-----
-
-Template: autoidimage

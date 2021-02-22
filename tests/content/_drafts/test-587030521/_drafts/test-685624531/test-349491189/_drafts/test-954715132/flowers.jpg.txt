@@ -1,5 +1,0 @@
-Autoid: ysnktpvg
-
-----
-
-Template: autoidimage

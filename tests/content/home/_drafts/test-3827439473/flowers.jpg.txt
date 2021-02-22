@@ -1,5 +1,0 @@
-Autoid: 1cw1jnau
-
-----
-
-Template: autoidimage

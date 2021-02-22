@@ -1,5 +1,0 @@
-Autoid: lp17vzii
-
-----
-
-Template: autoidimage

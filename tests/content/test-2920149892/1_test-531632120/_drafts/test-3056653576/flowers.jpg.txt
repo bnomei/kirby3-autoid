@@ -1,0 +1,5 @@
+Autoid: 1af08e1b
+
+----
+
+Template: autoidimage

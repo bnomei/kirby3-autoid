@@ -1,5 +1,0 @@
-Autoid: qafil022
-
-----
-
-Template: autoidimage

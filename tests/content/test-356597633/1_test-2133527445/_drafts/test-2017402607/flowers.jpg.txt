@@ -1,5 +1,0 @@
-Autoid: v562r0e2
-
-----
-
-Template: autoidimage

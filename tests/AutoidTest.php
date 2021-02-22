@@ -88,14 +88,14 @@ final class AutoidTest extends TestCase
         return $page;
     }
 
-    public function randomPage(): ?Page
+    public function randomPage(bool $drafts = false): ?Page
     {
-        return site()->pages()->index(true)->notTemplate('home')->shuffle()->first();
+        return site()->pages()->index($drafts)->notTemplate('home')->shuffle()->first();
     }
 
-    public function randomFile(): ?File
+    public function randomFile(bool $drafts = false): ?File
     {
-        return site()->pages()->index(true)->notTemplate('home')->files()->shuffle()->first();
+        return site()->pages()->index($drafts)->notTemplate('home')->files()->shuffle()->first();
     }
 
     public function tearDownPages(): void
@@ -141,7 +141,7 @@ final class AutoidTest extends TestCase
 
         $count = AutoID::index(); // none left
         $this->assertTrue(
-            $count === $all
+            $count === $all && $all !== 0
         );
     }
 
@@ -186,7 +186,6 @@ final class AutoidTest extends TestCase
 
         /* @var $page Page */
         $page = $this->randomPage();
-        var_dump($page->id());
 
         $this->assertTrue(
             AutoID::findByID($page->id()) === $page
@@ -444,6 +443,23 @@ final class AutoidTest extends TestCase
 
     public function testWorksWithDrafts()
     {
+        $page = null;
+        while (! $page ) {
+            $p = $this->randomPage(true);
+            if ($p->isDraft()) {
+                $page = $p;
+            }
+        }
 
+        $this->assertTrue(
+            AutoID::findByID($page->id()) === $page
+        );
+
+        $this->assertTrue(
+            \autoid($page->id()) === $page
+        );
+        $this->assertTrue(
+            \autoid($page) === $page
+        );
     }
 }

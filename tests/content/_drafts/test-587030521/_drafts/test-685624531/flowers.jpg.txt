@@ -1,5 +1,0 @@
-Autoid: qe37y8bq
-
-----
-
-Template: autoidimage
