@@ -59,7 +59,9 @@ final class AutoIDItem
                 $page = \bolt($id); // fast
             }
         }
-        return $page ? $page : AutoID::pageAndDrafts($id, $diruri);
+        // kirby->page() supports drafts
+        // https://getkirby.com/docs/reference/objects/kirby/page
+        return $page ? $page : kirby()->page($id);
     }
 
     public function file(): ?File

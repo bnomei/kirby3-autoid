@@ -225,22 +225,4 @@ final class AutoID
         }
         return rtrim($url, '/') . '/' . $autoid;
     }
-
-    public static function pageAndDrafts(string $id, string $diruri): ?\Kirby\Cms\Page
-    {
-        if (Str::contains($diruri, '_drafts')) {
-            // get page considering one (or more!) drafts in path
-            $page = null;
-            foreach(explode('/', $id) as $part) {
-                if ($part === '_drafts') {
-                    continue;
-                }
-                $page = $page ?
-                    $page->findPageOrDraft($part) :
-                    site()->findPageOrDraft($part);
-            }
-            return $page;
-        }
-        return page($id);
-    }
 }
