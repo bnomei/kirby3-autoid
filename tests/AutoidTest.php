@@ -408,7 +408,7 @@ final class AutoidTest extends TestCase
 
         // but AUTOID pagemethod should register and retrieve non the less
         $autoid = $newPage->AUTOID();
-        $this->assertRegExp('/^.{8}$/', $autoid);
+        $this->assertMatchesRegularExpression('/^.{8}$/', $autoid);
         $this->assertTrue(AutoIDDatabase::singleton()->exists($autoid));
         $this->assertEquals($newPage, AutoID::findByID($newPage->id()));
         $this->assertEquals($newPage, \autoid($newPage->id()));
@@ -432,7 +432,7 @@ final class AutoidTest extends TestCase
 
         $dbfilePath = AutoIDDatabase::singleton()->databaseFile();
         F::remove($dbfilePath);
-        $this->assertFileNotExists($dbfilePath);
+        $this->assertFileDoesNotExist($dbfilePath);
         new AutoIDDatabase(); // create db
         $this->assertFileExists($dbfilePath);
     }

@@ -31,6 +31,7 @@ return array(
     'Brick\\Math\\Internal\\Calculator\\GmpCalculator' => $vendorDir . '/brick/math/src/Internal/Calculator/GmpCalculator.php',
     'Brick\\Math\\Internal\\Calculator\\NativeCalculator' => $vendorDir . '/brick/math/src/Internal/Calculator/NativeCalculator.php',
     'Brick\\Math\\RoundingMode' => $vendorDir . '/brick/math/src/RoundingMode.php',
+    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'Hidehalo\\Nanoid\\Client' => $vendorDir . '/hidehalo/nanoid-php/src/Client.php',
     'Hidehalo\\Nanoid\\Core' => $vendorDir . '/hidehalo/nanoid-php/src/Core.php',
     'Hidehalo\\Nanoid\\CoreInterface' => $vendorDir . '/hidehalo/nanoid-php/src/CoreInterface.php',

@@ -59,12 +59,12 @@ final class GeneratorTest extends TestCase
     {
         $gen = new TokenGenerator();
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[a-z0-9]{8}$/',
             $gen->generate()
         );
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^[a-zA-Z0-9]{16}$/',
             $gen->generate(16, true, true, true)
         );
