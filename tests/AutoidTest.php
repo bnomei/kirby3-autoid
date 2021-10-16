@@ -90,6 +90,18 @@ final class AutoidTest extends TestCase
         return site()->pages()->index()->notTemplate('home')->shuffle()->first();
     }
 
+    public function randomPageWithChildren(): ?Page
+    {
+        $randomPage = null;
+        $hasChildren = false;
+        while (!$hasChildren) {
+            $randomPage = $this->randomPage();
+            $hasChildren = $randomPage->hasChildren();
+        }
+
+        return $randomPage;
+    }
+
     public function randomFile(): ?File
     {
         return site()->pages()->index()->notTemplate('home')->files()->shuffle()->first();
@@ -378,21 +390,24 @@ final class AutoidTest extends TestCase
 
     public function testFindByTemplate()
     {
-//        AutoID::flush();
-//        AutoID::index(true);
+        //AutoID::flush();
+        //AutoID::index(true);
 
-        $randomPage = $this->randomPage();
+        $randomPage = $this->randomPageWithChildren();
         $collection = AutoIDDatabase::singleton()->findByTemplate(
             'autoidtest',
             $randomPage->id()
         );
+        $this->assertTrue($collection->count() > 0);
         $this->assertEquals($randomPage->index()->not($randomPage)->count(), $collection->count());
 
-        $randomPage = $this->randomPage();
+        $randomPage = $this->randomPageWithChildren();
         $collection = $randomPage->searchForTemplate('autoidtest');
+        $this->assertTrue($collection->count() > 0);
         $this->assertEquals($randomPage->index()->not($randomPage)->count(), $collection->count());
 
         $collection = site()->searchForTemplate('autoidtest');
+        $this->assertTrue($collection->count() > 0);
         $this->assertEquals(site()->index()->notTemplate('home')->count(), $collection->count());
     }
 
