@@ -127,6 +127,12 @@ Kirby::plugin('bnomei/autoid', [
                 'value' => function (string $value = null) {
                     return $value;
                 },
+                'label' => function (string $label = null) {
+                    return $label;
+                },
+                'help' => function (string $help = null) {
+                    return $help;
+                },
             ],
         ],
     ],
