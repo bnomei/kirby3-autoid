@@ -41,7 +41,7 @@ if (! function_exists('autoid')) {
         return \Bnomei\AutoID::modified($autoid);
     }
 
-    function searchForTemplate(string $template, string $rootId = ''): \Kirby\Cms\Collection
+    function searchForTemplate(string $template, string $rootId = ''): \Kirby\Cms\Pages
     {
         return \Bnomei\AutoIDDatabase::singleton()->findByTemplate($template, $rootId);
     }
@@ -102,7 +102,7 @@ Kirby::plugin('bnomei/autoid', [
             }
             return site()->errorPage()->url();
         },
-        'searchForTemplate' => function (string $template): \Kirby\Cms\Collection {
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
             return searchForTemplate($template, $this->id());
         },
     ],
@@ -112,7 +112,7 @@ Kirby::plugin('bnomei/autoid', [
         },
     ],
     'siteMethods' => [
-        'searchForTemplate' => function (string $template): \Kirby\Cms\Collection {
+        'searchForTemplate' => function (string $template): \Kirby\Cms\Pages {
             return searchForTemplate($template, '/');
         },
     ],

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bnomei;
 
 use Kirby\Cache\FileCache;
-use Kirby\Cms\Collection;
+use Kirby\Cms\Pages;
 use Kirby\Cms\Field;
 use Kirby\Database\Database;
 use Kirby\Database\Db;
@@ -102,18 +102,18 @@ final class AutoIDDatabase
         return null;
     }
 
-    public function findByTemplate(string $template, string $rootId = ''): Collection
+    public function findByTemplate(string $template, string $rootId = ''): Pages
     {
         $rootId = ltrim($rootId, '/');
         if (strlen($rootId) > 0) {
             $rootId = " AND page LIKE '${rootId}%' AND page != '${rootId}'";
         }
-        $results = [];
+        $results = new \Kirby\Cms\Pages;
         $str = "SELECT * FROM AUTOID WHERE template = '${template}'" . $rootId;
         foreach ($this->database->query($str) as $obj) {
-            $results[] = (new AutoIDItem($obj))->toObject();
+            $results->add((new AutoIDItem($obj))->toObject());
         }
-        return new Collection($results);
+        return $results;
     }
 
     public function exists($autoid): bool
