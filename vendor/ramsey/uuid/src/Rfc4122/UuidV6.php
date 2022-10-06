@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace Ramsey\Uuid\Rfc4122;
 
-use Ramsey\Uuid\UuidInterface as BaseUuidInterface;
+use Ramsey\Uuid\Nonstandard\UuidV6 as NonstandardUuidV6;
 
 /**
- * Also known as a Leach-Salz variant UUID, an RFC 4122 variant UUID is a
- * universally unique identifier defined by RFC 4122
+ * Reordered time, or version 6, UUIDs include timestamp, clock sequence, and
+ * node values that are combined into a 128-bit unsigned integer
  *
- * @link https://tools.ietf.org/html/rfc4122 RFC 4122
+ * @link https://datatracker.ietf.org/doc/html/draft-peabody-dispatch-new-uuid-format-04#section-5.1 UUID Version 6
  *
  * @psalm-immutable
  */
-interface UuidInterface extends BaseUuidInterface
+final class UuidV6 extends NonstandardUuidV6 implements UuidInterface
 {
 }

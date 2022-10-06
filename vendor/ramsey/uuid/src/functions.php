@@ -15,17 +15,18 @@ declare(strict_types=1);
 
 namespace Ramsey\Uuid;
 
+use DateTimeInterface;
 use Ramsey\Uuid\Type\Hexadecimal;
 use Ramsey\Uuid\Type\Integer as IntegerObject;
 
 /**
- * Returns a version 1 (time-based) UUID from a host ID, sequence number,
+ * Returns a version 1 (Gregorian time) UUID from a host ID, sequence number,
  * and the current time
  *
  * @param Hexadecimal|int|string|null $node A 48-bit number representing the
  *     hardware address; this number may be represented as an integer or a
  *     hexadecimal string
- * @param int $clockSeq A 14-bit number used to help avoid duplicates that
+ * @param int|null $clockSeq A 14-bit number used to help avoid duplicates that
  *     could arise when the clock is set backwards in time or if the node ID
  *     changes
  *
@@ -106,12 +107,12 @@ function v5($ns, string $name): string
 }
 
 /**
- * Returns a version 6 (ordered-time) UUID from a host ID, sequence number,
+ * Returns a version 6 (reordered time) UUID from a host ID, sequence number,
  * and the current time
  *
  * @param Hexadecimal|null $node A 48-bit number representing the hardware
  *     address
- * @param int $clockSeq A 14-bit number used to help avoid duplicates that
+ * @param int|null $clockSeq A 14-bit number used to help avoid duplicates that
  *     could arise when the clock is set backwards in time or if the node ID
  *     changes
  *
@@ -120,4 +121,18 @@ function v5($ns, string $name): string
 function v6(?Hexadecimal $node = null, ?int $clockSeq = null): string
 {
     return Uuid::uuid6($node, $clockSeq)->toString();
+}
+
+/**
+ * Returns a version 7 (Unix Epoch time) UUID
+ *
+ * @param DateTimeInterface|null $dateTime An optional date/time from which
+ *     to create the version 7 UUID. If not provided, the UUID is generated
+ *     using the current date/time.
+ *
+ * @return non-empty-string Version 7 UUID as a string
+ */
+function v7(?DateTimeInterface $dateTime = null): string
+{
+    return Uuid::uuid7($dateTime)->toString();
 }

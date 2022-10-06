@@ -1,7 +1,7 @@
 {
   "name": "bnomei/kirby3-autoid",
   "type": "kirby-plugin",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "Automatic unique ID for Pages, Files and nested Structures including performant helpers to retrieve them. Bonus: Tiny-URL.",
   "license": "MIT",
   "authors": [
@@ -43,13 +43,13 @@
     }
   },
   "require": {
-    "php": ">=7.3.0",
+    "php": ">=8.0.0",
     "getkirby/composer-installer": "^1.2",
     "hidehalo/nanoid-php": "^1.1",
     "ramsey/uuid": "^4.1.1"
   },
   "require-dev": {
-    "getkirby/cms": "^3.5",
+    "getkirby/cms": ">3.5 <3.8",
     "php-coveralls/php-coveralls": "^2.4",
     "phpunit/phpunit": "^9.5"
   },

@@ -27,12 +27,12 @@ use Ramsey\Uuid\Uuid;
  *
  * @psalm-immutable
  */
-final class UuidV1 extends Uuid implements UuidInterface
+final class UuidV7 extends Uuid implements UuidInterface
 {
     use TimeTrait;
 
     /**
-     * Creates a version 1 (Gregorian time) UUID
+     * Creates a version 7 (Unix Epoch time) UUID
      *
      * @param Rfc4122FieldsInterface $fields The fields from which to construct a UUID
      * @param NumberConverterInterface $numberConverter The number converter to use
@@ -48,10 +48,10 @@ final class UuidV1 extends Uuid implements UuidInterface
         CodecInterface $codec,
         TimeConverterInterface $timeConverter
     ) {
-        if ($fields->getVersion() !== Uuid::UUID_TYPE_TIME) {
+        if ($fields->getVersion() !== Uuid::UUID_TYPE_UNIX_TIME) {
             throw new InvalidArgumentException(
-                'Fields used to create a UuidV1 must represent a '
-                . 'version 1 (time-based) UUID'
+                'Fields used to create a UuidV7 must represent a '
+                . 'version 7 (Unix Epoch time) UUID'
             );
         }
 
