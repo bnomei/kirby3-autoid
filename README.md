@@ -1,3 +1,7 @@
+> <br>
+> Kirby 3.8 introduced UUIDs for pages, users and file with structures and block following soonish. My AutoID plugin will not yield you big benefits thereafter. If you need more performance with UUIDs consider using my Boost Plugin in combination with the core UUIDs.<br>
+> &nbsp; 
+
 # Kirby 3 AutoID
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-autoid?color=ae81ff)
